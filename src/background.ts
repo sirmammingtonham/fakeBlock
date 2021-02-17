@@ -1,2 +1,2 @@
 // eslint-disable-next-line import/no-unassigned-import
-import './options-storage';
+console.log('background script test');

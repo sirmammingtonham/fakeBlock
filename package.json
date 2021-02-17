@@ -1,6 +1,7 @@
 {
 	"private": true,
 	"scripts": {
+		"clean": "rm -rf dist",
 		"build": "webpack --mode=production",
 		"lint": "run-p lint:*",
 		"lint-fix": "run-p 'lint:* -- --fix'",
@@ -26,13 +27,15 @@
 		"extends": "stylelint-config-xo"
 	},
 	"dependencies": {
-		"webext-options-sync": "^0.21.2",
-		"webextension-polyfill": "^0.4.0"
+		"webext-options-sync": "^2.0.1",
+		"webextension-polyfill": "^0.7.0",
+		"webextension-polyfill-ts": "^0.24.0"
 	},
 	"devDependencies": {
 		"@types/firefox-webext-browser": "^82.0.0",
 		"chrome-webstore-upload-cli": "^1.2.0",
 		"copy-webpack-plugin": "^5.0.3",
+		"css-loader": "^5.0.2",
 		"daily-version": "^0.12.0",
 		"dot-json": "^1.1.0",
 		"eslint": "^6.1.0",
@@ -45,7 +48,7 @@
 		"terser-webpack-plugin": "^1.3.0",
 		"ts-loader": "^8.0.17",
 		"typescript": "^4.1.5",
-		"web-ext": "^4.1.0",
+		"web-ext": "^4.3.0",
 		"web-ext-submit": "^4.1.0",
 		"webpack": "^4.36.1",
 		"webpack-cli": "^3.3.6",

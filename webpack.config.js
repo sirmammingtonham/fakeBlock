@@ -1,18 +1,19 @@
 const path = require("path");
 const SizePlugin = require("size-plugin");
-const CopyWebpackPlugin = require("copy-webpack-plugin");
+const CopyPlugin = require("copy-webpack-plugin");
 const TerserPlugin = require("terser-webpack-plugin");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 
 module.exports = {
+	mode: process.env.NODE_ENV,
 	devtool: "source-map",
 	stats: "errors-only",
 	entry: {
-		background: "./source/background",
-		options: "./source/options"
+		background: "./src/background.ts",
+		contentscript: "./src/contentscript.ts"
 	},
 	output: {
-		path: path.join(__dirname, "distribution"),
+		path: path.join(__dirname, "dist"),
 		filename: "[name].js"
 	},
 	module: {
@@ -30,18 +31,20 @@ module.exports = {
 	},
 	plugins: [
 		new SizePlugin(),
-		new CopyWebpackPlugin([
+		new CopyPlugin([
 			{
-				from: "**/*",
-				context: "source",
-				ignore: ["*.js"]
+				from: "./assets", to: "assets"
 			},
 			{
-				from: "node_modules/webextension-polyfill/dist/browser-polyfill.min.js"
+				from: "./node_modules/webextension-polyfill/dist/browser-polyfill.min.js"
+			},
+			{
+				from: "./manifest.json"
 			}
 		]),
 		new MiniCssExtractPlugin({
-			filename: "content.css"
+			filename: "[name].css",
+			chunkFilename: "[id].css"
 		})
 	],
 	optimization: {
@@ -59,6 +62,6 @@ module.exports = {
 		]
 	},
 	resolve: {
-		extensions: ['.ts', '.js']
-	}	
+		extensions: [".ts", ".js"]
+	}
 };
