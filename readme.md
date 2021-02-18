@@ -1,5 +1,5 @@
 # fakeblock
-### Misinformation Blocking Browser Extension
+## Misinformation Blocking Browser Extension
 
 RPI Software Design & Documentation S21
 
