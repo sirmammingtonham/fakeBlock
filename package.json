@@ -5,7 +5,7 @@
 		"build": "webpack --mode=production",
 		"lint": "run-p lint:*",
 		"lint-fix": "run-p 'lint:* -- --fix'",
-		"lint:css": "stylelint style/**/*.css",
+		"_lint:css": "stylelint style/**/*.css",
 		"lint:js": "xo",
 		"release:chrome": "cd dist && webstore upload --auto-publish",
 		"release:firefox": "cd dist && web-ext-submit",
@@ -21,7 +21,16 @@
 		],
 		"ignores": [
 			"dist"
-		]
+		],
+		"rules": {
+			"camelcase": [2, {"properties": "always"}]
+		},
+		"settings": {
+			"import/resolver": {
+				"node": {},
+				"webpack": {}
+			}
+		}
 	},
 	"stylelint": {
 		"extends": "stylelint-config-xo"
