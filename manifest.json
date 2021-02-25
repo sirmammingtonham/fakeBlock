@@ -1,5 +1,5 @@
 {
-	"name": "FakeBlock",
+	"name": "fakeBlock",
 	"version": "0.0.0",
 	"description": "Browser extension that protects you from misinformation",
 	"homepage_url": "https://github.com/sirmammingtonham/fakeblock",
@@ -23,8 +23,8 @@
 	],
 	"content_scripts": [
 		{
-		  "js": ["contentscript.js"],
-		  "css": ["contentscript.css"],
+		  "js": ["blocker.js"],
+		  "css": ["blocker.css"],
 		  "matches": ["<all_urls>"]
 		}
 	  ],

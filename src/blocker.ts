@@ -1,5 +1,8 @@
-document.body.textContent = '';
+import '../style/blocker.css';
 
-const header = document.createElement('h1');
-header.textContent = 'This page has been eaten';
-document.body.append(header);
+// document.body.textContent = '';
+
+// const header = document.createElement('h1');
+// header.textContent = 'This page has been eaten';
+// document.body.append(header);
+console.log('blocker running in page!');

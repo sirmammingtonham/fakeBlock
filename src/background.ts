@@ -5,22 +5,6 @@ console.log('background script test');
 const imageScanner = new ImageScanner();
 const textScanner = new TextScanner();
 
-function onCreated() {
-	if (browser.runtime.lastError) {
-		console.log(`Error: ${browser.runtime.lastError as string}`);
-	} else {
-		console.log('Context menu item created successfully');
-	}
-}
-
-browser.webNavigation.onCommitted.addListener(() => {
-	browser.tabs.executeScript({
-		file: 'blocker.js'
-	}).catch(error => {
-		console.log(error);
-	});
-});
-
 // Scans image
 browser.contextMenus.create(
 	{
@@ -28,7 +12,9 @@ browser.contextMenus.create(
 		title: 'Scan with fakeBlock', // Browser.i18n.getMessage("contextMenuItemSelectionLogger"),
 		contexts: ['image']
 	},
-	onCreated
+	() => {
+		console.log('image context menu created');
+	}
 );
 
 // Scans text
@@ -38,7 +24,9 @@ browser.contextMenus.create(
 		title: 'Scan with fakeBlock',
 		contexts: ['selection']
 	},
-	onCreated
+	() => {
+		console.log('text selection context menu created');
+	}
 );
 
 browser.contextMenus.onClicked.addListener((info, _tab) => {
