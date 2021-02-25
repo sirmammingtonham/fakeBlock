@@ -17,7 +17,9 @@
 	"permissions": [
 		"storage",
 		"tabs",
-		"contextMenus"
+		"contextMenus",
+		"activeTab",
+		"webNavigation"
 	],
 	"content_scripts": [
 		{

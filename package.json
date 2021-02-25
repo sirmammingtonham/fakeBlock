@@ -23,7 +23,12 @@
 			"dist"
 		],
 		"rules": {
-			"camelcase": [2, {"properties": "always"}]
+			"camelcase": [
+				2,
+				{
+					"properties": "always"
+				}
+			]
 		},
 		"settings": {
 			"import/resolver": {

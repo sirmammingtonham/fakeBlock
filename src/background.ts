@@ -13,6 +13,14 @@ function onCreated() {
 	}
 }
 
+browser.webNavigation.onCommitted.addListener(() => {
+	browser.tabs.executeScript({
+		file: 'blocker.js'
+	}).catch(error => {
+		console.log(error);
+	});
+});
+
 // Scans image
 browser.contextMenus.create(
 	{

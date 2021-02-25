@@ -10,7 +10,8 @@ module.exports = {
 	stats: 'errors-only',
 	entry: {
 		background: './src/background.ts',
-		contentscript: './src/contentscript.ts'
+		contentscript: './src/contentscript.ts',
+		blocker: './src/blocker.ts'
 	},
 	output: {
 		path: path.join(__dirname, 'dist'),
