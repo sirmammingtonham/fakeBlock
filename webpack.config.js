@@ -41,17 +41,17 @@ module.exports = {
 				from: './node_modules/webextension-polyfill/dist/browser-polyfill.min.js'
 			},
 			{
-				from: './public/manifest.json'
+				from: './manifest.json'
 			},
 			{
-				from: './public/index.html'
+				from: './public/*'
 			}
 		]),
 		new CleanWebpackPlugin(),
 		new MiniCssExtractPlugin({
 			filename: '[name].css',
 			chunkFilename: '[id].css'
-		}),
+		})
 	],
 	optimization: {
 		minimizer: [
