@@ -3,6 +3,7 @@ const SizePlugin = require('size-plugin');
 const CopyPlugin = require('copy-webpack-plugin');
 const TerserPlugin = require('terser-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const {CleanWebpackPlugin} = require('clean-webpack-plugin');
 
 module.exports = {
 	mode: process.env.NODE_ENV,
@@ -10,7 +11,8 @@ module.exports = {
 	stats: 'errors-only',
 	entry: {
 		background: './src/background.ts',
-		contentscript: './src/contentscript.ts'
+		blocker: './src/blocker.ts'
+		// contentscript: './src/contentscript.ts',
 	},
 	output: {
 		path: path.join(__dirname, 'dist'),
@@ -19,8 +21,8 @@ module.exports = {
 	module: {
 		rules: [
 			{
-				test: /\.css$/,
-				use: [MiniCssExtractPlugin.loader, 'css-loader']
+				test: /\.scss$/,
+				use: [MiniCssExtractPlugin.loader, 'css-loader', 'sass-loader']
 			},
 			{
 				test: /\.(js|ts|tsx)$/,
@@ -40,8 +42,12 @@ module.exports = {
 			},
 			{
 				from: './manifest.json'
+			},
+			{
+				from: './public/*'
 			}
 		]),
+		new CleanWebpackPlugin(),
 		new MiniCssExtractPlugin({
 			filename: '[name].css',
 			chunkFilename: '[id].css'
