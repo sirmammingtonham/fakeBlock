@@ -11,7 +11,8 @@ module.exports = {
 	stats: 'errors-only',
 	entry: {
 		background: './src/background.ts',
-		blocker: './src/blocker.ts'
+		blocker: './src/blocker.ts',
+		frontend: './src/index.js',
 		// contentscript: './src/contentscript.ts',
 	},
 	output: {
@@ -25,8 +26,13 @@ module.exports = {
 				use: [MiniCssExtractPlugin.loader, 'css-loader', 'sass-loader']
 			},
 			{
-				test: /\.(js|ts|tsx)$/,
+				test: /\.(ts|tsx)$/,
 				loader: 'ts-loader',
+				exclude: /node_modules/
+			},
+			{
+				test: /\.js$/,
+				loader: 'babel-loader',
 				exclude: /node_modules/
 			}
 		]
