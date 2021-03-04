@@ -44,6 +44,7 @@
 		"extends": "stylelint-config-xo"
 	},
 	"dependencies": {
+		"jquery": "^3.6.0",
 		"node-sass": "^5.0.0",
 		"webext-options-sync": "^2.0.1",
 		"webextension-polyfill": "^0.7.0",
