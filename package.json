@@ -6,7 +6,7 @@
 		"lint": "run-p lint:*",
 		"lint-fix": "run-p 'lint:* -- --fix'",
 		"lint:css": "stylelint style/**/*.scss --fix",
-		"lint:js": "xo",
+		"lint:js": "xo --fix",
 		"release:chrome": "cd dist && webstore upload --auto-publish",
 		"release:firefox": "cd dist && web-ext-submit",
 		"test": "run-s lint:* build",
@@ -45,7 +45,6 @@
 	},
 	"dependencies": {
 		"jquery": "^3.6.0",
-		"@babel/preset-react": "^7.12.13",
 		"node-sass": "^5.0.0",
 		"react": "^17.0.1",
 		"react-dom": "^17.0.1",
@@ -55,11 +54,10 @@
 		"webextension-polyfill-ts": "^0.24.0"
 	},
 	"devDependencies": {
-		"@babel/core": "^7.13.8",
-		"@babel/preset-env": "^7.13.9",
 		"@types/firefox-webext-browser": "^82.0.0",
 		"@types/jquery": "^3.5.5",
-		"babel-loader": "^8.2.2",
+		"@types/react": "^17.0.2",
+		"@types/react-dom": "^17.0.1",
 		"chrome-webstore-upload-cli": "^1.2.0",
 		"clean-webpack-plugin": "^3.0.0",
 		"copy-webpack-plugin": "^5.0.3",

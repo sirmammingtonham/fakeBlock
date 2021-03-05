@@ -12,8 +12,7 @@ module.exports = {
 	entry: {
 		background: './src/background.ts',
 		blocker: './src/blocker.ts',
-		frontend: './src/index.js',
-		// contentscript: './src/contentscript.ts',
+		popup: './src/index.tsx'
 	},
 	output: {
 		path: path.join(__dirname, 'dist'),
@@ -26,13 +25,8 @@ module.exports = {
 				use: [MiniCssExtractPlugin.loader, 'css-loader', 'sass-loader']
 			},
 			{
-				test: /\.(ts|tsx)$/,
+				test: /\.(js|ts|tsx)$/,
 				loader: 'ts-loader',
-				exclude: /node_modules/
-			},
-			{
-				test: /\.js$/,
-				loader: 'babel-loader',
 				exclude: /node_modules/
 			}
 		]
@@ -41,10 +35,12 @@ module.exports = {
 		new SizePlugin(),
 		new CopyPlugin([
 			{
-				from: './assets', to: 'assets'
+				from: './assets',
+				to: 'assets'
 			},
 			{
-				from: './node_modules/webextension-polyfill/dist/browser-polyfill.min.js'
+				from:
+					'./node_modules/webextension-polyfill/dist/browser-polyfill.min.js'
 			},
 			{
 				from: './manifest.json'
@@ -74,6 +70,6 @@ module.exports = {
 		]
 	},
 	resolve: {
-		extensions: ['.ts', '.js']
+		extensions: ['.ts', '.tsx', '.js']
 	}
 };

@@ -33,7 +33,7 @@ console.log(pageType(window.location.origin));
 // Replace paragraphs with collapsible divs
 const elementArray = document.querySelectorAll('p');
 
-for (const [index, p] of elementArray.entries()) {
+for (const [index, p] of Array.from(elementArray).entries()) {
 	const containerDiv = document.createElement('div');
 	const innerDiv = document.createElement('div');
 	innerDiv.classList.add('block', 'collapse', `_${index}`);
