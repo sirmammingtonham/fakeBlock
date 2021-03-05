@@ -1,4 +1,7 @@
 import '../style/blocker.scss';
+import {pageType} from './util/page-type';
+
+console.log(pageType(window.location.origin));
 
 // Set up collapsible CSS
 // const collapsibleStyle = document.createElement('style');
