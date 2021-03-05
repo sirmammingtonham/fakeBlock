@@ -15,11 +15,6 @@
 	},
 	"xo": {
 		"envs": [
-			"chrome",
-			"browser"
-		],
-		"globals": [
-			"chrome",
 			"browser"
 		],
 		"ignores": [
