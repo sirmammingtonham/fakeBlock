@@ -15,9 +15,11 @@
 	},
 	"xo": {
 		"envs": [
+			"chrome",
 			"browser"
 		],
 		"globals": [
+			"chrome",
 			"browser"
 		],
 		"ignores": [
@@ -45,6 +47,7 @@
 		"extends": "stylelint-config-xo"
 	},
 	"dependencies": {
+		"@types/chrome": "0.0.133",
 		"jquery": "^3.6.0",
 		"node-sass": "^5.0.0",
 		"react": "^17.0.1",
