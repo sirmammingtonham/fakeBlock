@@ -42,12 +42,16 @@
 		"extends": "stylelint-config-xo"
 	},
 	"dependencies": {
+		"@material-ui/core": "^4.11.3",
 		"@types/chrome": "0.0.133",
 		"jquery": "^3.6.0",
 		"node-sass": "^5.0.0",
+		"prop-types": "^15.7.2",
 		"react": "^17.0.1",
 		"react-dom": "^17.0.1",
 		"react-router-dom": "^5.2.0",
+		"tabler": "^1.0.0-alpha.8",
+		"tabler-react": "^2.0.0-alpha.1",
 		"webext-options-sync": "^2.0.1",
 		"webextension-polyfill": "^0.7.0",
 		"webextension-polyfill-ts": "^0.24.0"
