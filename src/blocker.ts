@@ -29,8 +29,8 @@ function checkLinks() {
 		if (!shouldSkip && subDomain in CJRIndex) {
 			const indexEntry = CJRIndex[subDomain];
 			console.log('found sketchy link!');
-			$(this).addClass('linkSus');
-			$(this).append(`<span class="linkSusText">Link's website reported as ${indexEntry.categories as unknown as string}!</span>`);
+			$(this).addClass('link-sus');
+			$(this).append(`<span class="link-sus-text">Link's website reported as ${indexEntry.categories}!</span>`);
 		}
 	});
 }
@@ -43,13 +43,13 @@ function testBlocker() {
 	for (const [index, p] of Array.from(elementArray).entries()) {
 		const containerDiv = document.createElement('div');
 		const innerDiv = document.createElement('div');
-		innerDiv.classList.add('block', 'collapse', `_${index as number}`);
+		innerDiv.classList.add('block', 'collapse', `_${index}`);
 
 		const toggleButton = document.createElement('button');
 		toggleButton.innerHTML = 'Detected misinformation! Click to show.';
 		toggleButton.classList.add('btn', 'btn-primary', 'btn__first');
 		toggleButton.dataset.toggle = 'collapse';
-		toggleButton.dataset.target = `.collapse._${index as number}`;
+		toggleButton.dataset.target = `.collapse._${index}`;
 		toggleButton.dataset.text = 'Collapse';
 
 		const hiddenContent = document.createElement('p');
