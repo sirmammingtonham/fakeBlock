@@ -1,19 +1,42 @@
 import '../style/blocker.scss';
+import $ from 'jquery';
+import * as CJRIndex from '../assets/cjrindex.json';
 import {browser} from 'webextension-polyfill-ts';
-import {pageType} from './util/page-type';
+import {Websites, pageType} from './util/page-type';
 
 // check if the extension has been enabled by the user
 (async () => {
 	const retrieved = await browser.storage.local.get('enabled');
 	const enabled = !retrieved.enabled ?? true;
 	if (enabled) {
-		testBlocker();
+		switch (pageType(window.location.origin)) {
+			case Websites.kFacebook:
+			case Websites.kTwitter:
+			default:
+				testBlocker();
+		}
 	}
 })();
 
-function testBlocker() {
-	console.log(pageType(window.location.origin));
+function checkLinks() {
+	const domainRegex = /^(?:https?:\/\/)?(?:[^@\n]+@)?(?:www\.)?([^:/\n?]+)/;
+	// should make this look nicer
+	$('a').each(function (this: any) {
+		const subDomain: keyof typeof CJRIndex = this.href.match(domainRegex)[1];
+		// these websites have a million links to themselves,
+		// should ignore otherwise page will get bloated with warnings
+		const shouldSkip = window.location.origin.includes(subDomain);
+		if (!shouldSkip && subDomain in CJRIndex) {
+			const indexEntry = CJRIndex[subDomain];
+			console.log('found sketchy link!');
+			$(this).addClass('linkSus');
+			$(this).append(`<span class="linkSusText">Link's website reported as ${indexEntry.categories as unknown as string}!</span>`);
+		}
+	});
+}
 
+function testBlocker() {
+	checkLinks();
 	// Replace paragraphs with collapsible divs
 	const elementArray = document.querySelectorAll('p');
 

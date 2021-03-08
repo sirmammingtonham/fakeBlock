@@ -1,12 +1,17 @@
-export function pageType(url: string): string {
-	enum Site {
-		'https://twitter.com' = 'twitter',
-		'https://www.facebook.com' = 'facebook'
-	}
-	console.log(url);
-	if (url in Site) {
-		return Site[url as keyof typeof Site];
+export const enum Websites {
+	kOther,
+	kTwitter,
+	kFacebook
+}
+
+export function pageType(url: string): Websites {
+	if (url.includes('twitter.com')) {
+		return Websites.kTwitter;
 	}
 
-	return 'OTHER';
+	if (url.includes('facebook.com')) {
+		return Websites.kTwitter;
+	}
+
+	return Websites.kOther;
 }
