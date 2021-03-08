@@ -1,82 +1,93 @@
 import '../style/blocker.scss';
+import $ from 'jquery';
+import * as CJRIndex from '../assets/cjrindex.json';
+import {browser} from 'webextension-polyfill-ts';
+import {Websites, pageType} from './util/page-type';
 
-// Set up collapsible CSS
-// const collapsibleStyle = document.createElement('style');
-// collapsibleStyle.innerHTML = `
-// *, ::after, ::before {
-// 	box-sizing: border-box;
-// }
-// .collapse {
-// 	display: block;
-// 	max-height: 0px;
-// 	overflow: hidden;
-// 	transition: max-height 0.5s cubic-bezier(0, 1, 0, 1);
-// }
-// .collapse.show {
-// 	max-height: 99em;
-// 	transition: max-height 0.8s ease-in-out;
-// }
-// .block {
-// 	margin-top: 10px;
-// 	background: #f5f5f5;
-// 	padding: 0;
-// }
-// .block__content {
-// 	border: 1px solid #ccc;
-// 	padding: 1.5em;
-// 	height: 100%;
-// }`;
+// check if the extension has been enabled by the user
+(async () => {
+	const retrieved = await browser.storage.local.get('enabled');
+	const enabled = !retrieved.enabled ?? true;
+	if (enabled) {
+		switch (pageType(window.location.origin)) {
+			case Websites.kFacebook:
+			case Websites.kTwitter:
+			default:
+				testBlocker();
+		}
+	}
+})();
 
-// Replace paragraphs with collapsible divs
-const elementArray = document.querySelectorAll('p');
-
-for (const [index, p] of elementArray.entries()) {
-	const containerDiv = document.createElement('div');
-	const innerDiv = document.createElement('div');
-	innerDiv.classList.add('block', 'collapse', `_${index}`);
-
-	const toggleButton = document.createElement('button');
-	toggleButton.innerHTML = 'Detected misinformation! Click to show.';
-	toggleButton.classList.add('btn', 'btn-primary', 'btn__first');
-	toggleButton.dataset.toggle = 'collapse';
-	toggleButton.dataset.target = `.collapse._${index}`;
-	toggleButton.dataset.text = 'Collapse';
-
-	const hiddenContent = document.createElement('p');
-	hiddenContent.innerHTML = p.innerHTML;
-	hiddenContent.classList.add('block__content');
-
-	innerDiv.append(hiddenContent);
-
-	containerDiv.append(toggleButton);
-	containerDiv.append(innerDiv);
-	containerDiv.append(document.createElement('br')); // spacing
-	p.replaceWith(containerDiv);
+function checkLinks() {
+	const domainRegex = /^(?:https?:\/\/)?(?:[^@\n]+@)?(?:www\.)?([^:/\n?]+)/;
+	// should make this look nicer
+	$('a').each(function (this: any) {
+		const subDomain: keyof typeof CJRIndex = this.href.match(domainRegex)[1];
+		// these websites have a million links to themselves,
+		// should ignore otherwise page will get bloated with warnings
+		const shouldSkip = window.location.origin.includes(subDomain);
+		if (!shouldSkip && subDomain in CJRIndex) {
+			const indexEntry = CJRIndex[subDomain];
+			console.log('found sketchy link!');
+			$(this).addClass('link-sus');
+			$(this).append(`<span class="link-sus-text">Link's website reported as ${indexEntry.categories}!</span>`);
+		}
+	});
 }
 
-// document.head.append(collapsibleStyle);
+function testBlocker() {
+	checkLinks();
+	// Replace paragraphs with collapsible divs
+	const elementArray = document.querySelectorAll('p');
 
-const triggers = new Set(Array.from(document.querySelectorAll('[data-toggle="collapse"]')));
+	for (const [index, p] of Array.from(elementArray).entries()) {
+		const containerDiv = document.createElement('div');
+		const innerDiv = document.createElement('div');
+		innerDiv.classList.add('block', 'collapse', `_${index}`);
 
-window.addEventListener('click', ev => {
-	const elm = ev.target as Element;
-	if (triggers.has(elm)) {
-		const selector = elm.getAttribute('data-target');
-		collapse(selector, 'toggle');
+		const toggleButton = document.createElement('button');
+		toggleButton.innerHTML = 'Detected misinformation! Click to show.';
+		toggleButton.classList.add('btn', 'btn-primary', 'btn__first');
+		toggleButton.dataset.toggle = 'collapse';
+		toggleButton.dataset.target = `.collapse._${index}`;
+		toggleButton.dataset.text = 'Collapse';
+
+		const hiddenContent = document.createElement('p');
+		hiddenContent.innerHTML = p.innerHTML;
+		hiddenContent.classList.add('block__content');
+
+		innerDiv.append(hiddenContent);
+
+		containerDiv.append(toggleButton);
+		containerDiv.append(innerDiv);
+		containerDiv.append(document.createElement('br')); // spacing
+		p.replaceWith(containerDiv);
 	}
-}, false);
 
-const fnmap: any = {
-	toggle: 'toggle',
-	show: 'add',
-	hide: 'remove'
-};
+	// document.head.append(collapsibleStyle);
 
-const collapse = (selector: any, cmd: string) => {
-	const targets = Array.from(document.querySelectorAll(selector));
-	for (const target of targets) {
-		target.classList[fnmap[cmd]]('show');
-	}
-};
+	const triggers = new Set(Array.from(document.querySelectorAll('[data-toggle="collapse"]')));
 
-console.log('blocker running in page!');
+	window.addEventListener('click', ev => {
+		const elm = ev.target as Element;
+		if (triggers.has(elm)) {
+			const selector = elm.getAttribute('data-target');
+			collapse(selector, 'toggle');
+		}
+	}, false);
+
+	const fnmap: any = {
+		toggle: 'toggle',
+		show: 'add',
+		hide: 'remove'
+	};
+
+	const collapse = (selector: any, cmd: string) => {
+		const targets = Array.from(document.querySelectorAll(selector));
+		for (const target of targets) {
+			target.classList[fnmap[cmd]]('show');
+		}
+	};
+
+	console.log('blocker running in page!');
+}

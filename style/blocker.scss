@@ -28,3 +28,42 @@
 		height: 100%;
 	}
 }
+
+/* linkwarning container */
+.link-sus { // haha funny amogus
+	position: relative;
+	display: inline-block;
+	border-bottom: 1px dotted rgb(0, 0, 0);
+
+	.link-sus-text {
+		visibility: hidden;
+		width: 120px;
+		background-color: rgb(0, 0, 0);
+		color: #fff;
+		text-align: center;
+		border-radius: 6px;
+		padding: 5px 0;
+		position: absolute;
+		z-index: 1;
+		top: 150%;
+		left: 50%;
+		margin-left: -60px;
+
+		&::after {
+			content: '';
+			position: absolute;
+			bottom: 100%;
+			left: 50%;
+			margin-left: -5px;
+			border-width: 5px;
+			border-style: solid;
+			border-color: transparent transparent rgb(0, 0, 0);
+		}
+	}
+
+	&:hover {
+		.link-sus-text {
+			visibility: visible;
+		}
+	}
+}

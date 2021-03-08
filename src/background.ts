@@ -47,3 +47,32 @@ browser.contextMenus.onClicked.addListener((info, _tab) => {
 			break;
 	}
 });
+
+// probably don't need this, apparently you can do everything in the content script
+// idk why everything online says you can't...
+// browser.runtime.onMessage.addListener((request: any, _sender: browser.runtime.MessageSender, sendResponse: any) => {
+// 	switch (request?.message) {
+// 		case 'getEnabled': {
+// 			(async () => {
+// 				const retrieved = await browser.storage.local.get('enabled');
+// 				const enabled = !retrieved.enabled ?? true;
+// 				sendResponse({response: enabled});
+// 			})();
+
+// 			return true;
+// 		}
+
+// 		case 'reload': {
+// 			(async () => {
+// 				await browser.tabs.reload();
+// 			})();
+
+// 			break;
+// 		}
+
+// 		default:
+// 			break;
+// 	}
+
+// 	return false;
+// });

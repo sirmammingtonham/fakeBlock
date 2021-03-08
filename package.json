@@ -3,10 +3,11 @@
 	"scripts": {
 		"clean": "rm -rf dist",
 		"build": "webpack --mode=production",
+		"scripts": "tsc scripts/run-scripts.ts --outDir dist/scripts && node dist/scripts/run-scripts.js",
 		"lint": "run-p lint:*",
 		"lint-fix": "run-p 'lint:* -- --fix'",
 		"lint:css": "stylelint style/**/*.scss --fix",
-		"lint:js": "xo",
+		"lint:js": "xo --fix",
 		"release:chrome": "cd dist && webstore upload --auto-publish",
 		"release:firefox": "cd dist && web-ext-submit",
 		"test": "run-s lint:* build",
@@ -14,9 +15,6 @@
 	},
 	"xo": {
 		"envs": [
-			"browser"
-		],
-		"globals": [
 			"browser"
 		],
 		"ignores": [
@@ -31,6 +29,9 @@
 			],
 			"capitalized-comments": [
 				"off"
+			],
+			"@typescript-eslint/restrict-template-expressions": [
+				"off"
 			]
 		},
 		"settings": {
@@ -44,13 +45,26 @@
 		"extends": "stylelint-config-xo"
 	},
 	"dependencies": {
+		"@material-ui/core": "^4.11.3",
+		"@types/chrome": "0.0.133",
+		"jquery": "^3.6.0",
 		"node-sass": "^5.0.0",
+		"prop-types": "^15.7.2",
+		"react": "^17.0.1",
+		"react-dom": "^17.0.1",
+		"react-router-dom": "^5.2.0",
+		"tabler": "^1.0.0-alpha.8",
+		"tabler-react": "^2.0.0-alpha.1",
 		"webext-options-sync": "^2.0.1",
 		"webextension-polyfill": "^0.7.0",
 		"webextension-polyfill-ts": "^0.24.0"
 	},
 	"devDependencies": {
 		"@types/firefox-webext-browser": "^82.0.0",
+		"@types/jquery": "^3.5.5",
+		"@types/react": "^17.0.2",
+		"@types/react-dom": "^17.0.1",
+		"axios": "^0.21.1",
 		"chrome-webstore-upload-cli": "^1.2.0",
 		"clean-webpack-plugin": "^3.0.0",
 		"copy-webpack-plugin": "^5.0.3",

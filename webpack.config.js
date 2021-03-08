@@ -11,8 +11,8 @@ module.exports = {
 	stats: 'errors-only',
 	entry: {
 		background: './src/background.ts',
-		blocker: './src/blocker.ts'
-		// contentscript: './src/contentscript.ts',
+		blocker: './src/blocker.ts',
+		popup: './src/index.tsx'
 	},
 	output: {
 		path: path.join(__dirname, 'dist'),
@@ -21,7 +21,7 @@ module.exports = {
 	module: {
 		rules: [
 			{
-				test: /\.scss$/,
+				test: /\.(scss|css)$/,
 				use: [MiniCssExtractPlugin.loader, 'css-loader', 'sass-loader']
 			},
 			{
@@ -35,10 +35,12 @@ module.exports = {
 		new SizePlugin(),
 		new CopyPlugin([
 			{
-				from: './assets', to: 'assets'
+				from: './assets',
+				to: 'assets'
 			},
 			{
-				from: './node_modules/webextension-polyfill/dist/browser-polyfill.min.js'
+				from:
+					'./node_modules/webextension-polyfill/dist/browser-polyfill.min.js'
 			},
 			{
 				from: './manifest.json'
@@ -68,6 +70,6 @@ module.exports = {
 		]
 	},
 	resolve: {
-		extensions: ['.ts', '.js']
+		extensions: ['.ts', '.tsx', '.js']
 	}
 };
