@@ -79,8 +79,8 @@ def get_tfds(
     elif len(features_name) == 2:
         for k in files.keys():
             transformed_ds[k] = ds[k].map(
-                lambda example: tokenizer.batch_encode_plus(
-                    (example[features_name[0]], example[features_name[1]]),
+                lambda example: tokenizer(
+                    example[features_name[0]], example[features_name[1]],
                     truncation=True,
                     max_length=max_seq_length,
                     padding="max_length",
