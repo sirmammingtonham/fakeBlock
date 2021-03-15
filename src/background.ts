@@ -1,9 +1,14 @@
-import {ImageScanner} from './scan_scripts/scan-image';
-import {TextScanner} from './scan_scripts/scan-text';
+import {ImageClassifier} from './detection/image-classifier';
+import {TextClassifier} from './detection/text-classifier';
 
 console.log('background script test');
-const imageScanner = new ImageScanner();
-const textScanner = new TextScanner();
+let imageScanner: ImageClassifier;
+let textScanner: TextClassifier;
+
+(async () => {
+	imageScanner = new ImageClassifier();
+	textScanner = await TextClassifier.getInstance();
+})();
 
 // Scans image
 browser.contextMenus.create(
@@ -29,17 +34,17 @@ browser.contextMenus.create(
 	}
 );
 
-browser.contextMenus.onClicked.addListener((info, _tab) => {
+browser.contextMenus.onClicked.addListener(async (info, _tab) => {
 	switch (info.menuItemId) {
 		case 'scan-image':
 			if (info.srcUrl) {
-				imageScanner.scanImage(info.srcUrl);
+				imageScanner.classifyImage(info.srcUrl);
 			}
 
 			break;
 		case 'scan-selection':
 			if (info.selectionText) {
-				textScanner.scanText(info.selectionText);
+				await textScanner.classifyText({body: info.selectionText});
 			}
 
 			break;

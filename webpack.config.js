@@ -47,6 +47,9 @@ module.exports = {
 			},
 			{
 				from: './public/*'
+			},
+			{
+				from: './ml/distilbertu_ISOT'
 			}
 		]),
 		new CleanWebpackPlugin(),

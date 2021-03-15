@@ -16,3 +16,5 @@ python run_tf_text_classification.py `
   --save_steps 1000 `
   --overwrite_output_dir `
   --max_seq_length 512
+
+saved_model_cli show --dir distilbertu_ISOT --tag_set serve --signature_def serving_default

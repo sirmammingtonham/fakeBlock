@@ -40,7 +40,7 @@ function testBlocker() {
 	// Replace paragraphs with collapsible divs
 	const elementArray = document.querySelectorAll('p');
 
-	for (const [index, p] of Array.from(elementArray).entries()) {
+	for (const [index, p] of [...elementArray].entries()) {
 		const containerDiv = document.createElement('div');
 		const innerDiv = document.createElement('div');
 		innerDiv.classList.add('block', 'collapse', `_${index}`);
@@ -66,7 +66,7 @@ function testBlocker() {
 
 	// document.head.append(collapsibleStyle);
 
-	const triggers = new Set(Array.from(document.querySelectorAll('[data-toggle="collapse"]')));
+	const triggers = new Set([...document.querySelectorAll('[data-toggle="collapse"]')]);
 
 	window.addEventListener('click', ev => {
 		const elm = ev.target as Element;
@@ -83,7 +83,7 @@ function testBlocker() {
 	};
 
 	const collapse = (selector: any, cmd: string) => {
-		const targets = Array.from(document.querySelectorAll(selector));
+		const targets = [...document.querySelectorAll(selector)];
 		for (const target of targets) {
 			target.classList[fnmap[cmd]]('show');
 		}
