@@ -8,7 +8,51 @@
 		</style>
 	</head>
 	<body>
+
+		<!-- <script src="https://unpkg.com/@material-ui/core@next/umd/material-ui.development.js" crossorigin="anonymous"></script>
+		<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" />
+		<link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons" /> -->
+		<style>
+			body {
+			  padding-top: 10em;
+			  background-color: black;
+			  color: white;
+			  text-align: center;
+			}
+			h2 {
+			  font-size: 50px;
+			}
+			ul {
+			  list-style: none;
+			}
+			p, li {
+			  font-size: 30px;
+			}
+			#quoted {
+				color:  rgb(245, 157, 157);
+				padding-left: 3em;
+				padding-right: 3em;
+			}
+			#url {
+				color:  rgb(253, 106, 106);
+				padding-left: 3em;
+				padding-right: 3em;
+			}
+		  </style>
+		  <h2>Your scanned text: </h2>
+		  <p id='url'><i>https://greatgameindia.com/coronavirus-bioweapon/</i></p>
+		  <p id='quoted'>[Last year a mysterious shipment was caught smuggling Coronavirus from Canada. It was traced to Chinese agents working at a Canadian lab. Subsequent investigation by GreatGameIndia linked the agents to Chinese Biological Warfare Program from where the virus is suspected to have leaked causing the Wuhan Coronavirus outbreak.]</p>
+		  <h2>ML Model Confidence</h2>
+		  <ul>
+			<li>Fake News: 90.562%</li>
+			<li>AI-generated: 74.644%</li>
+			<li>Manipulated Text: 50.245%</li>
+		  </ul>
 		<div id="app"></div>
+
 	</body>
 	<script src="../results.js"></script>
+	
+
+
 </html>
