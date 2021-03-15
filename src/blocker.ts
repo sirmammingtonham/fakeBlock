@@ -1,6 +1,6 @@
 import '../style/blocker.scss';
-import $ from 'jquery';
-import * as CJRIndex from '../assets/cjrindex.json';
+// import $ from 'jquery';
+// import * as CJRIndex from '../assets/cjrindex.json';
 import {browser} from 'webextension-polyfill-ts';
 import {Websites, pageType} from './util/page-type';
 
@@ -18,25 +18,25 @@ import {Websites, pageType} from './util/page-type';
 	}
 })();
 
-function checkLinks() {
-	const domainRegex = /^(?:https?:\/\/)?(?:[^@\n]+@)?(?:www\.)?([^:/\n?]+)/;
-	// should make this look nicer
-	$('a').each(function (this: any) {
-		const subDomain: keyof typeof CJRIndex = this.href.match(domainRegex)[1];
-		// these websites have a million links to themselves,
-		// should ignore otherwise page will get bloated with warnings
-		const shouldSkip = window.location.origin.includes(subDomain);
-		if (!shouldSkip && subDomain in CJRIndex) {
-			const indexEntry = CJRIndex[subDomain];
-			console.log('found sketchy link!');
-			$(this).addClass('link-sus');
-			$(this).append(`<span class="link-sus-text">Link's website reported as ${indexEntry.categories}!</span>`);
-		}
-	});
-}
+// function checkLinks() {
+// 	const domainRegex = /^(?:https?:\/\/)?(?:[^@\n]+@)?(?:www\.)?([^:/\n?]+)/;
+// 	// should make this look nicer
+// 	$('a').each(function (this: any) {
+// 		const subDomain: keyof typeof CJRIndex = this.href.match(domainRegex)[1];
+// 		// these websites have a million links to themselves,
+// 		// should ignore otherwise page will get bloated with warnings
+// 		const shouldSkip = window.location.origin.includes(subDomain);
+// 		if (!shouldSkip && subDomain in CJRIndex) {
+// 			const indexEntry = CJRIndex[subDomain];
+// 			console.log('found sketchy link!');
+// 			$(this).addClass('linkSus');
+// 			$(this).append(`<span class="linkSusText">Link's website reported as ${indexEntry.categories as unknown as string}!</span>`);
+// 		}
+// 	});
+// }
 
 function testBlocker() {
-	checkLinks();
+	// checkLinks();
 	// Replace paragraphs with collapsible divs
 	const elementArray = document.querySelectorAll('p');
 
