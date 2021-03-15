@@ -1,6 +1,6 @@
 import '../style/blocker.scss';
-import $ from 'jquery';
-import * as CJRIndex from '../assets/cjrindex.json';
+// import $ from 'jquery';
+// import * as CJRIndex from '../assets/cjrindex.json';
 import {browser} from 'webextension-polyfill-ts';
 import {Websites, pageType} from './util/page-type';
 
@@ -18,29 +18,29 @@ import {Websites, pageType} from './util/page-type';
 	}
 })();
 
-function checkLinks() {
-	const domainRegex = /^(?:https?:\/\/)?(?:[^@\n]+@)?(?:www\.)?([^:/\n?]+)/;
-	// should make this look nicer
-	$('a').each(function (this: any) {
-		const subDomain: keyof typeof CJRIndex = this.href.match(domainRegex)[1];
-		// these websites have a million links to themselves,
-		// should ignore otherwise page will get bloated with warnings
-		const shouldSkip = window.location.origin.includes(subDomain);
-		if (!shouldSkip && subDomain in CJRIndex) {
-			const indexEntry = CJRIndex[subDomain];
-			console.log('found sketchy link!');
-			$(this).addClass('link-sus');
-			$(this).append(`<span class="link-sus-text">Link's website reported as ${indexEntry.categories}!</span>`);
-		}
-	});
-}
+// function checkLinks() {
+// 	const domainRegex = /^(?:https?:\/\/)?(?:[^@\n]+@)?(?:www\.)?([^:/\n?]+)/;
+// 	// should make this look nicer
+// 	$('a').each(function (this: any) {
+// 		const subDomain: keyof typeof CJRIndex = this.href.match(domainRegex)[1];
+// 		// these websites have a million links to themselves,
+// 		// should ignore otherwise page will get bloated with warnings
+// 		const shouldSkip = window.location.origin.includes(subDomain);
+// 		if (!shouldSkip && subDomain in CJRIndex) {
+// 			const indexEntry = CJRIndex[subDomain];
+// 			console.log('found sketchy link!');
+// 			$(this).addClass('linkSus');
+// 			$(this).append(`<span class="linkSusText">Link's website reported as ${indexEntry.categories as unknown as string}!</span>`);
+// 		}
+// 	});
+// }
 
 function testBlocker() {
-	checkLinks();
+	// checkLinks();
 	// Replace paragraphs with collapsible divs
 	const elementArray = document.querySelectorAll('p');
 
-	for (const [index, p] of Array.from(elementArray).entries()) {
+	for (const [index, p] of [...elementArray].entries()) {
 		const containerDiv = document.createElement('div');
 		const innerDiv = document.createElement('div');
 		innerDiv.classList.add('block', 'collapse', `_${index}`);
@@ -66,7 +66,7 @@ function testBlocker() {
 
 	// document.head.append(collapsibleStyle);
 
-	const triggers = new Set(Array.from(document.querySelectorAll('[data-toggle="collapse"]')));
+	const triggers = new Set([...document.querySelectorAll('[data-toggle="collapse"]')]);
 
 	window.addEventListener('click', ev => {
 		const elm = ev.target as Element;
@@ -83,7 +83,7 @@ function testBlocker() {
 	};
 
 	const collapse = (selector: any, cmd: string) => {
-		const targets = Array.from(document.querySelectorAll(selector));
+		const targets = [...document.querySelectorAll(selector)];
 		for (const target of targets) {
 			target.classList[fnmap[cmd]]('show');
 		}

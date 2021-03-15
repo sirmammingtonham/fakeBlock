@@ -1,3 +1,5 @@
 import * as scraper from './webscraper';
 
-scraper.exportCJRIndex();
+(async () => {
+	await scraper.exportCJRIndex();
+})();
