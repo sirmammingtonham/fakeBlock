@@ -40,13 +40,13 @@ function testBlocker() {
 	// Replace paragraphs with collapsible divs
 	const elementArray = document.querySelectorAll('p');
 
-	for (const [index, p] of [...elementArray].entries()) {
+	for (const [index, p] of [...elementArray].slice(1, 2).entries()) {
 		const containerDiv = document.createElement('div');
 		const innerDiv = document.createElement('div');
 		innerDiv.classList.add('block', 'collapse', `_${index}`);
 
 		const toggleButton = document.createElement('button');
-		toggleButton.innerHTML = 'Detected misinformation! Click to show.';
+		toggleButton.innerHTML = 'Detected fake news! Click to show.';
 		toggleButton.classList.add('btn', 'btn-primary', 'btn__first');
 		toggleButton.dataset.toggle = 'collapse';
 		toggleButton.dataset.target = `.collapse._${index}`;
@@ -56,6 +56,16 @@ function testBlocker() {
 		hiddenContent.innerHTML = p.innerHTML;
 		hiddenContent.classList.add('block__content');
 
+		const resultsLink = document.createElement('a');
+		resultsLink.innerHTML = 'See why we\'ve blocked this!';
+
+		resultsLink.addEventListener('click', async () => {
+			console.log('pls');
+			await browser.runtime.sendMessage({message: 'openNewTab', url: '/public/results.html'});
+		});
+
+		hiddenContent.append(document.createElement('br'));
+		hiddenContent.append(resultsLink);
 		innerDiv.append(hiddenContent);
 
 		containerDiv.append(toggleButton);
