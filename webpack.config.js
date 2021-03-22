@@ -50,7 +50,8 @@ module.exports = {
 				from: './public/*'
 			},
 			{
-				from: './ml/distilbertu_ISOT'
+				from: './ml/distilbert_ISOT',
+				to: 'distilbert'
 			}
 		]),
 		new CleanWebpackPlugin(),
