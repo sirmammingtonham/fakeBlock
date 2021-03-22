@@ -38,8 +38,7 @@ import {Websites, pageType} from './util/page-type';
 function testBlocker() {
 	// checkLinks();
 	// Replace paragraphs with collapsible divs
-	const elementArray = document.querySelectorAll('p');
-
+	const elementArray = document.querySelectorAll('p,h1,h2,h3')
 	for (const [index, p] of [...elementArray].slice(1, 2).entries()) {
 		const containerDiv = document.createElement('div');
 		const innerDiv = document.createElement('div');
@@ -74,7 +73,43 @@ function testBlocker() {
 		p.replaceWith(containerDiv);
 	}
 
+	/*const divArray = document.querySelectorAll('div')
+	//go through divs, try getting only divs with text in them
+	for (const [index, p] of [...divArray].slice(1, 2).entries()) {
+		const containerDiv = document.createElement('div');
+		const innerDiv = document.createElement('div');
+		innerDiv.classList.add('block', 'collapse', `_${index}`);
+
+		const toggleButton = document.createElement('button');
+		toggleButton.innerHTML = 'Detected fake news! Click to show.';
+		toggleButton.classList.add('btn', 'btn-primary', 'btn__first');
+		toggleButton.dataset.toggle = 'collapse';
+		toggleButton.dataset.target = `.collapse._${index}`;
+		toggleButton.dataset.text = 'Collapse';
+
+		const hiddenContent = document.createElement('p');
+		hiddenContent.textContent = p.textContent;
+		hiddenContent.classList.add('block__content');
+
+		const resultsLink = document.createElement('a');
+		resultsLink.innerHTML = 'See why we\'ve blocked this!';
+
+		resultsLink.addEventListener('click', async () => {
+			console.log('pls');
+			await browser.runtime.sendMessage({message: 'openNewTab', url: '/public/results.html'});
+		});
+
+		hiddenContent.append(document.createElement('br'));
+		hiddenContent.append(resultsLink);
+		innerDiv.append(hiddenContent);
+
+		containerDiv.append(toggleButton);
+		containerDiv.append(innerDiv);
+		containerDiv.append(document.createElement('br')); // spacing
+		p.replaceWith(containerDiv);
+	}
 	// document.head.append(collapsibleStyle);
+	*/
 
 	const triggers = new Set([...document.querySelectorAll('[data-toggle="collapse"]')]);
 
