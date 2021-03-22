@@ -38,7 +38,7 @@ import {Websites, pageType} from './util/page-type';
 function testBlocker() {
 	// checkLinks();
 	// Replace paragraphs with collapsible divs
-	const elementArray = document.querySelectorAll('p,h1,h2,h3')
+	const elementArray = document.querySelectorAll('p,h1,h2,h3');
 	for (const [index, p] of [...elementArray].slice(1, 2).entries()) {
 		const containerDiv = document.createElement('div');
 		const innerDiv = document.createElement('div');
@@ -73,7 +73,7 @@ function testBlocker() {
 		p.replaceWith(containerDiv);
 	}
 
-	/*const divArray = document.querySelectorAll('div')
+	/* const divArray = document.querySelectorAll('div')
 	//go through divs, try getting only divs with text in them
 	for (const [index, p] of [...divArray].slice(1, 2).entries()) {
 		const containerDiv = document.createElement('div');
