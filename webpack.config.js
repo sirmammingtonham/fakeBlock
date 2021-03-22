@@ -12,7 +12,8 @@ module.exports = {
 	entry: {
 		background: './src/background.ts',
 		blocker: './src/blocker.ts',
-		popup: './src/index.tsx'
+		popup: './src/popup.tsx',
+		results: './src/results.tsx'
 	},
 	output: {
 		path: path.join(__dirname, 'dist'),
@@ -49,7 +50,8 @@ module.exports = {
 				from: './public/*'
 			},
 			{
-				from: './ml/distilbertu_ISOT'
+				from: './ml/distilbert_ISOT',
+				to: 'distilbert'
 			}
 		]),
 		new CleanWebpackPlugin(),

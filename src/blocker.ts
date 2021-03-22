@@ -7,7 +7,7 @@ import {Websites, pageType} from './util/page-type';
 // check if the extension has been enabled by the user
 (async () => {
 	const retrieved = await browser.storage.local.get('enabled');
-	const enabled = !retrieved.enabled ?? true;
+	const enabled = retrieved.enabled ?? true;
 	if (enabled) {
 		switch (pageType(window.location.origin)) {
 			case Websites.kFacebook:
@@ -38,15 +38,15 @@ import {Websites, pageType} from './util/page-type';
 function testBlocker() {
 	// checkLinks();
 	// Replace paragraphs with collapsible divs
-	const elementArray = document.querySelectorAll('p');
-
+	// Add support later for other tags
+	const elementArray = document.querySelectorAll('p,h1,h2,h3,h4,h5,h6,dd,li,text');
 	for (const [index, p] of [...elementArray].entries()) {
 		const containerDiv = document.createElement('div');
 		const innerDiv = document.createElement('div');
 		innerDiv.classList.add('block', 'collapse', `_${index}`);
 
 		const toggleButton = document.createElement('button');
-		toggleButton.innerHTML = 'Detected misinformation! Click to show.';
+		toggleButton.innerHTML = 'Detected fake news! Click to show.';
 		toggleButton.classList.add('btn', 'btn-primary', 'btn__first');
 		toggleButton.dataset.toggle = 'collapse';
 		toggleButton.dataset.target = `.collapse._${index}`;
@@ -56,12 +56,62 @@ function testBlocker() {
 		hiddenContent.innerHTML = p.innerHTML;
 		hiddenContent.classList.add('block__content');
 
+		const resultsLink = document.createElement('a');
+		resultsLink.innerHTML = 'See why we\'ve blocked this!';
+
+		resultsLink.addEventListener('click', async () => {
+			console.log('pls');
+			await browser.runtime.sendMessage({message: 'openNewTab', url: '/public/results.html'});
+		});
+
+		hiddenContent.append(document.createElement('br'));
+		hiddenContent.append(resultsLink);
 		innerDiv.append(hiddenContent);
 
 		containerDiv.append(toggleButton);
 		containerDiv.append(innerDiv);
 		containerDiv.append(document.createElement('br')); // spacing
 		p.replaceWith(containerDiv);
+	}
+
+	const divArray = document.querySelectorAll('div,span');
+	// go through divs, try getting only divs with text in them
+	// general solution, block all divs that have no childrem, but this needs to be worked out
+	// text can have <b>(bold), <i>(italic) elements and things like that which prevent the blocking
+	for (const [index, p] of [...divArray].entries()) {
+		if (!p.hasChildNodes() && p.textContent !== '') {
+			const containerDiv = document.createElement('div');
+			const innerDiv = document.createElement('div');
+			innerDiv.classList.add('block', 'collapse', `_${index}`);
+
+			const toggleButton = document.createElement('button');
+			toggleButton.innerHTML = 'Detected fake news! Click to show.';
+			toggleButton.classList.add('btn', 'btn-primary', 'btn__first');
+			toggleButton.dataset.toggle = 'collapse';
+			toggleButton.dataset.target = `.collapse._${index}`;
+			toggleButton.dataset.text = 'Collapse';
+
+			const hiddenContent = document.createElement('p');
+			hiddenContent.innerHTML = p.innerHTML;
+			hiddenContent.classList.add('block__content');
+
+			const resultsLink = document.createElement('a');
+			resultsLink.innerHTML = 'See why we\'ve blocked this!';
+
+			resultsLink.addEventListener('click', async () => {
+				console.log('pls');
+				await browser.runtime.sendMessage({message: 'openNewTab', url: '/public/results.html'});
+			});
+
+			hiddenContent.append(document.createElement('br'));
+			hiddenContent.append(resultsLink);
+			innerDiv.append(hiddenContent);
+
+			containerDiv.append(toggleButton);
+			containerDiv.append(innerDiv);
+			containerDiv.append(document.createElement('br')); // spacing
+			p.replaceWith(containerDiv);
+		}
 	}
 
 	// document.head.append(collapsibleStyle);

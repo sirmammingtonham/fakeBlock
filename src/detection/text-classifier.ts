@@ -1,7 +1,5 @@
 import * as tf from '@tensorflow/tfjs';
-// import {TFSavedModel} from '@tensorflow/tfjs-node/dist/saved_model.js';
-// import {BertWordPieceTokenizer} from 'tokenizers';
-// tokenizer library relies on rust, cant use webpack?
+import * as bert from './tokenizer/bert-tokenizer';
 
 export interface ArticleData {
 	headline?: string;
@@ -12,39 +10,33 @@ export interface ArticleData {
 export class TextClassifier {
 	private static instance: TextClassifier;
 	private model!: tf.GraphModel;
-	// private tokenizer!: BertWordPieceTokenizer;
+	private tokenizer!: bert.BertTokenizer;
+
 	private constructor() {
 		console.log('Instance created');
 	}
 
 	private static get modelPath() {
-		return './distilbertu_ISOT';
-	}
-
-	private static get vocabPath() {
-		return './distilbertu_ISOT';
+		return './distilbert/model.json';
 	}
 
 	public static async getInstance(): Promise<TextClassifier> {
 		if (!TextClassifier.instance) {
 			TextClassifier.instance = new TextClassifier();
-			await TextClassifier.instance.init(TextClassifier.modelPath, TextClassifier.vocabPath);
+			await TextClassifier.instance.init(TextClassifier.modelPath);
 		}
 
 		return TextClassifier.instance;
 	}
 
 	public async classifyText(_selection: ArticleData): Promise<boolean> {
-		// const {tokens, attentionMask} = await (
-		// 	selection.headline ? TextClassifier.instance.tokenizer.encode(selection.headline, selection.body) :
-		// 		TextClassifier.instance.tokenizer.encode(selection.body)
-		// );
-		const tokens = [0];
-		const attentionMask = [0];
+		const {inputIds, inputMask} = this.tokenizer.convertSingleExample(
+			_selection.headline ? _selection.headline + ' ' + _selection.body : _selection.body
+		);
 
 		const result = tf.tidy(() => {
-			const inputTensor = tf.tensor(tokens, undefined, 'int32');
-			const maskTensor = tf.tensor(attentionMask, undefined, 'int32');
+			const inputTensor = tf.tensor(inputIds, undefined, 'int32');
+			const maskTensor = tf.tensor(inputMask, undefined, 'int32');
 
 			// Run model inference
 			const result = this.model.predict({
@@ -62,11 +54,8 @@ export class TextClassifier {
 		return result;
 	}
 
-	private async init(modelPath: string, _vocabPath: string) {
+	private async init(modelPath: string) {
 		TextClassifier.instance.model = await tf.loadGraphModel(modelPath);
-		// TextClassifier.instance.tokenizer = await BertWordPieceTokenizer.fromOptions({
-		// 	vocabFile: vocabPath, lowercase: true
-		// });
-		// TextClassifier.instance.tokenizer.setPadding({maxLength: 512});
+		TextClassifier.instance.tokenizer = new bert.BertTokenizer(true, 512);
 	}
 }
