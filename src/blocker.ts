@@ -79,7 +79,7 @@ function testBlocker() {
 	// general solution, block all divs that have no childrem, but this needs to be worked out
 	// text can have <b>(bold), <i>(italic) elements and things like that which prevent the blocking
 	for (const [index, p] of [...divArray].entries()) {
-		if (!p.hasChildNodes() && p.textContent != '') {
+		if (!p.hasChildNodes() && p.textContent !== '') {
 			const containerDiv = document.createElement('div');
 			const innerDiv = document.createElement('div');
 			innerDiv.classList.add('block', 'collapse', `_${index}`);
@@ -115,7 +115,6 @@ function testBlocker() {
 	}
 
 	// document.head.append(collapsibleStyle);
-
 
 	const triggers = new Set([...document.querySelectorAll('[data-toggle="collapse"]')]);
 
