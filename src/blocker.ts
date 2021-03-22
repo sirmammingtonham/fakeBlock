@@ -7,7 +7,7 @@ import {Websites, pageType} from './util/page-type';
 // check if the extension has been enabled by the user
 (async () => {
 	const retrieved = await browser.storage.local.get('enabled');
-	const enabled = !retrieved.enabled ?? true;
+	const enabled = retrieved.enabled ?? true;
 	if (enabled) {
 		switch (pageType(window.location.origin)) {
 			case Websites.kFacebook:
@@ -38,8 +38,8 @@ import {Websites, pageType} from './util/page-type';
 function testBlocker() {
 	// checkLinks();
 	// Replace paragraphs with collapsible divs
-	//Add support later for other tags
-	const elementArray = document.querySelectorAll('p,h1,h2,h3,h4,h5,h6,dd,li,text')
+	// Add support later for other tags
+	const elementArray = document.querySelectorAll('p,h1,h2,h3,h4,h5,h6,dd,li,text');
 	for (const [index, p] of [...elementArray].entries()) {
 		const containerDiv = document.createElement('div');
 		const innerDiv = document.createElement('div');
@@ -74,13 +74,12 @@ function testBlocker() {
 		p.replaceWith(containerDiv);
 	}
 
-	const divArray = document.querySelectorAll('div,span')
-	//go through divs, try getting only divs with text in them
-	//general solution, block all divs that have no childrem, but this needs to be worked out
-	//text can have <b>(bold), <i>(italic) elements and things like that which prevent the blocking
+	const divArray = document.querySelectorAll('div,span');
+	// go through divs, try getting only divs with text in them
+	// general solution, block all divs that have no childrem, but this needs to be worked out
+	// text can have <b>(bold), <i>(italic) elements and things like that which prevent the blocking
 	for (const [index, p] of [...divArray].entries()) {
-		if(!p.hasChildNodes() && p.textContent != "")
-		{
+		if (!p.hasChildNodes() && p.textContent != '') {
 			const containerDiv = document.createElement('div');
 			const innerDiv = document.createElement('div');
 			innerDiv.classList.add('block', 'collapse', `_${index}`);
@@ -100,7 +99,7 @@ function testBlocker() {
 			resultsLink.innerHTML = 'See why we\'ve blocked this!';
 
 			resultsLink.addEventListener('click', async () => {
-			console.log('pls');
+				console.log('pls');
 				await browser.runtime.sendMessage({message: 'openNewTab', url: '/public/results.html'});
 			});
 
@@ -114,9 +113,9 @@ function testBlocker() {
 			p.replaceWith(containerDiv);
 		}
 	}
-	
+
 	// document.head.append(collapsibleStyle);
-	
+
 
 	const triggers = new Set([...document.querySelectorAll('[data-toggle="collapse"]')]);
 
