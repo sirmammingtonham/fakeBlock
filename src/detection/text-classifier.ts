@@ -35,20 +35,17 @@ export class TextClassifier {
 		);
 
 		const result = tf.tidy(() => {
-			const inputTensor = tf.tensor(inputIds, undefined, 'int32');
-			const maskTensor = tf.tensor(inputMask, undefined, 'int32');
+			const inputTensor = tf.tensor(inputIds, undefined, 'int32').expandDims(0);
+			const maskTensor = tf.tensor(inputMask, undefined, 'int32').expandDims(0);
 
 			// Run model inference
 			const result = this.model.predict({
 				'input_ids': inputTensor, 'attention_mask': maskTensor // eslint-disable-line quote-props
-			}) as tf.NamedTensorMap;
-			if (result.logits) {
-				const predictions = tf.softmax(result.logits, -1);
-				const value = tf.argMax(predictions, -1).dataSync();
-				return value[0] === 1;
-			}
+			}) as tf.Tensor<tf.Rank>;
 
-			return false;
+			const predictions = tf.softmax(result, -1);
+			const value = tf.argMax(predictions, 1).dataSync();
+			return value[0] === 1;
 		});
 
 		return result;

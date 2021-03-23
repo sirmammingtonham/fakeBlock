@@ -44,7 +44,8 @@ browser.contextMenus.onClicked.addListener(async (info, _tab) => {
 			break;
 		case 'scan-selection':
 			if (info.selectionText) {
-				await textScanner.classifyText({body: info.selectionText});
+				const result = await textScanner.classifyText({body: info.selectionText});
+				console.log(`Scan result for "${info.selectionText}": ${result ? 'fake!' : 'legit'}`);
 			}
 
 			break;
@@ -53,8 +54,6 @@ browser.contextMenus.onClicked.addListener(async (info, _tab) => {
 	}
 });
 
-// probably don't need this, apparently you can do everything in the content script
-// idk why everything online says you can't...
 browser.runtime.onMessage.addListener(async (request: any, _sender: browser.runtime.MessageSender, sendResponse: any) => {
 	switch (request?.message) {
 		case 'getEnabled': {

@@ -32,7 +32,7 @@ class TrieNode {
 }
 
 class Trie {
-	root: TrieNode;
+	root: TrieNode | undefined;
 
 	constructor() {
 		this.root = new TrieNode(null);
@@ -47,13 +47,14 @@ class Trie {
 		}
 
 		for (let i = 0; i < symbols.length; i++) {
-			if (!node.children[symbols[i]!]) {
-				node.children[symbols[i]!] = new TrieNode(symbols[i]!);
-				node.children[symbols[i]!]!.parent = node;
+			const symbol = symbols[i]!;
+			if (node && !node.children[symbol]) {
+				node.children[symbol] = new TrieNode(symbol);
+				node.children[symbol]!.parent = node;
 			}
 
-			node = node.children[symbols[i]!]!;
-			if (i === symbols.length - 1) {
+			node = node?.children[symbol];
+			if (node && i === symbols.length - 1) {
 				node.end = true;
 				node.score = score;
 				node.index = index;
@@ -65,8 +66,8 @@ class Trie {
 		let node = this.root;
 		let iter = 0;
 
-		while (iter < ss.length && node !== null) {
-			node = node.children[ss[iter]!]!;
+		while (iter < ss.length && node) {
+			node = node.children[ss[iter]!];
 			iter++;
 		}
 

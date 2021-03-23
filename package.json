@@ -2,7 +2,7 @@
 	"private": true,
 	"scripts": {
 		"clean": "rm -rf dist",
-		"build": "webpack --mode=production",
+		"build": "webpack --mode=development",
 		"scripts": "tsc scripts/run-scripts.ts --outDir dist/scripts && node dist/scripts/run-scripts.js",
 		"lint": "run-p lint:*",
 		"lint-fix": "run-p 'lint:* -- --fix'",
