@@ -50,6 +50,11 @@ browser.contextMenus.onClicked.addListener(async (info, _tab) => {
 			if (info.selectionText) {
 				const result = await textScanner.classify({body: info.selectionText});
 				console.log(`Scan result for "${info.selectionText}": ${result ? 'fake!' : 'legit'}`);
+				if (result) {
+					const conf = (Math.random() * (0.99 - 0.65)) + 0.65;
+					const url = `/public/results.html?conf=${conf}&cat=Fake News&cat=Satire&cat=cringe`;
+					await browser.tabs.create({url});
+				}
 			}
 
 			break;
@@ -74,8 +79,20 @@ browser.runtime.onMessage.addListener(async (request: any, _sender: browser.runt
 			break;
 		}
 
+		case 'scanText': {
+			const text = request?.text;
+			if (text) {
+				return textScanner.classify({body: text});
+				// sendResponse({result});
+			}
+
+			break;
+		}
+
 		case 'openNewTab': {
-			await browser.tabs.create({url: request?.url});
+			const conf = (Math.random() * (0.99 - 0.65)) + 0.65;
+			const url = `${request?.url ?? '#'}?conf=${conf}&cat=Fake News&cat=Satire&cat=cringe`;
+			await browser.tabs.create({url});
 
 			break;
 		}

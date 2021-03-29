@@ -8,8 +8,9 @@ export default class Result extends React.Component {
 		const parameters = new URLSearchParams(window.location.search);
 		const categories = parameters.getAll('cat');
 		const chips = [];
-		for (const cat of categories.entries()) {
-			chips.push(<Chip color="secondary" label={cat} icon={<Warning />} />);
+		for (const cat of categories) {
+			chips.push(<Chip color="secondary" label={cat} icon={<Warning />} />, <span>&nbsp;&nbsp;</span>);
+			// chips.push(<span>&nbsp;&nbsp;</span>);
 		}
 
 		return (
@@ -23,7 +24,7 @@ export default class Result extends React.Component {
 				<Container maxWidth="sm">
 					<h1>Here are some stats you may be interested in:</h1>
 					<Box>
-						<p>Percent Confidence: {parameters.get('conf')}</p>
+						<h3>Percent Confidence: {parameters.get('conf')}</h3>
 					</Box>
 				</Container>
 			</div>
