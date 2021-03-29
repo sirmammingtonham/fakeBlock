@@ -1,13 +1,17 @@
-import {ImageClassifier} from './detection/image-classifier';
-import {TextClassifier} from './detection/text-classifier';
+import {Classifier} from './detection/classifier';
+import {Factory} from './factory/factory';
+import {ImageFactory} from './factory/image-factory';
+import {TextFactory} from './factory/text-factory';
 
 console.log('background script test');
-let imageScanner: ImageClassifier;
-let textScanner: TextClassifier;
+const imageFactory: Factory = new ImageFactory();
+const textFactory: Factory = new TextFactory();
+let imageScanner: Classifier;
+let textScanner: Classifier;
 
 (async () => {
-	imageScanner = new ImageClassifier();
-	textScanner = await TextClassifier.getInstance();
+	imageScanner = await imageFactory.createClassifier({_: 'image'});
+	textScanner = await textFactory.createClassifier({_: 'text'});
 })();
 
 // Scans image
@@ -38,13 +42,13 @@ browser.contextMenus.onClicked.addListener(async (info, _tab) => {
 	switch (info.menuItemId) {
 		case 'scan-image':
 			if (info.srcUrl) {
-				imageScanner.classifyImage(info.srcUrl);
+				await imageScanner.classify(info.srcUrl);
 			}
 
 			break;
 		case 'scan-selection':
 			if (info.selectionText) {
-				const result = await textScanner.classifyText({body: info.selectionText});
+				const result = await textScanner.classify({body: info.selectionText});
 				console.log(`Scan result for "${info.selectionText}": ${result ? 'fake!' : 'legit'}`);
 			}
 
