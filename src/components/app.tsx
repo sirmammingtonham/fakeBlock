@@ -2,7 +2,8 @@ import {browser} from 'webextension-polyfill-ts';
 import React from 'react';
 import {FormControlLabel, Switch, withStyles, Grid} from '@material-ui/core';
 import {render} from 'react-dom';
-import Demo from './progressbar';
+import LinearWithValueLabel from './progressbar';
+import WhiteList from './whitelist';
 type MyState = {powerOn: boolean; infoblocker: boolean; infowarning: boolean};
 export default class App extends React.Component<Record<string, unknown>, MyState> {
 	// enabled: boolean;
@@ -61,9 +62,10 @@ export default class App extends React.Component<Record<string, unknown>, MyStat
 			control = {<BigSwitch checked={this.state.powerOn} name="power" color="secondary" onChange={this.buttonClick}></BigSwitch>}
 			label = {this.state.powerOn ? 'Power on' : ' Power off'}
 		/>
-		<Demo/>
-		</Grid>
+		<LinearWithValueLabel percentage={60}/>
 		<hr></hr>
+		<WhiteList webs={['google.com', 'notgoogle.com', 'twitter.com', 'sdf', 'd'] }/>
+		</Grid>
 		</div>
 		);
 		//  <Button variant= "contained" color= "secondary" onClick={this.buttonclick}>Toggle fakeBlock!</Button>;
