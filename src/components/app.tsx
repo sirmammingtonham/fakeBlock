@@ -1,9 +1,8 @@
 import {browser} from 'webextension-polyfill-ts';
 import React from 'react';
-import {FormControlLabel, Switch, withStyles} from '@material-ui/core';
+import {FormControlLabel, Switch, withStyles, Grid} from '@material-ui/core';
 import {render} from 'react-dom';
 import Demo from './progressbar';
-
 type MyState = {powerOn: boolean; infoblocker: boolean; infowarning: boolean};
 export default class App extends React.Component<Record<string, unknown>, MyState> {
 	// enabled: boolean;
@@ -58,16 +57,12 @@ export default class App extends React.Component<Record<string, unknown>, MyStat
 			checked: {}
 		})(Switch);
 
-		return (<div><FormControlLabel
+		return (<div><Grid item xs={12} md={12}><FormControlLabel
 			control = {<BigSwitch checked={this.state.powerOn} name="power" color="secondary" onChange={this.buttonClick}></BigSwitch>}
 			label = {this.state.powerOn ? 'Power on' : ' Power off'}
 		/>
-		<FormControlLabel
-			control={<Switch checked={this.state.powerOn} onChange={this.buttonClick} name="checkedA" />}
-			label="Custom color"
-		/>
-
 		<Demo/>
+		</Grid>
 		<hr></hr>
 		</div>
 		);
