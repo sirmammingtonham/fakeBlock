@@ -4,34 +4,36 @@ import {FormControlLabel, Switch, withStyles, Grid} from '@material-ui/core';
 import {render} from 'react-dom';
 import LinearWithValueLabel from './progressbar';
 import WhiteList from './whitelist';
-type MyState = {powerOn: boolean; infoblocker: boolean; infowarning: boolean};
-export default class App extends React.Component<Record<string, unknown>, MyState> {
-	// enabled: boolean;
-	constructor(props: any) {
+
+type PopupProps = any;
+type PopupState = {powerOn: boolean; whitelist: string[]};
+
+export default class Popup extends React.Component<PopupProps, PopupState> {
+	constructor(props: PopupProps) {
 		super(props);
 		this.state = {
 			powerOn: true,
-			infoblocker: false,
-			infowarning: true
+			whitelist: []
 		};
 		this.buttonClick = this.buttonClick.bind(this);
 	}
 
-	async buttonClick() { // event: any
+	async buttonClick() {
 		const retrieved = await browser.storage.local.get('enabled');
 		const enabled = !retrieved.enabled ?? true; // check if anything is assigned
-		// console.log(enabled);
 		await browser.storage.local.set({
 			enabled
 		});
 		await browser.tabs.reload();
+		await browser.browserAction.setIcon({path: enabled ? '../assets/icon.png' : '../assets/icon_disabled.png'});
+
 		this.setState({...this.state, powerOn: enabled});
 	}
 
 	async componentDidMount() {
-		const retrieved = await browser.storage.local.get('enabled');
-		const enabled = retrieved.enabled ?? true; // check if anything is assigned
-		this.setState({powerOn: enabled});
+		const enabled: boolean = (await browser.storage.local.get('enabled'))?.enabled ?? true;
+		const disabledList: string[] = (await browser.storage.local.get('whitelist'))?.whitelist ?? [];
+		this.setState({...this.state, powerOn: enabled, whitelist: disabledList});
 	}
 
 	render() {
@@ -58,18 +60,20 @@ export default class App extends React.Component<Record<string, unknown>, MyStat
 			checked: {}
 		})(Switch);
 
-		return (<div><Grid item xs={12} md={12}><FormControlLabel
-			control = {<BigSwitch checked={this.state.powerOn} name="power" color="secondary" onChange={this.buttonClick}></BigSwitch>}
-			label = {this.state.powerOn ? 'Power on' : ' Power off'}
-		/>
-		<LinearWithValueLabel percentage={60}/>
-		<hr></hr>
-		<WhiteList webs={['google.com', 'notgoogle.com', 'twitter.com', 'sdf', 'd'] }/>
-		</Grid>
-		</div>
+		return (
+			<div>
+				<Grid item xs={12} md={12}>
+					<FormControlLabel
+						control = {<BigSwitch checked={this.state.powerOn} name="power" color="secondary" onChange={this.buttonClick}></BigSwitch>}
+						label = {this.state.powerOn ? 'Power on' : ' Power off'}
+					/>
+					<LinearWithValueLabel percentage={60}/>
+					<hr></hr>
+					<WhiteList webs={this.state.whitelist}/>
+				</Grid>
+			</div>
 		);
-		//  <Button variant= "contained" color= "secondary" onClick={this.buttonclick}>Toggle fakeBlock!</Button>;
 	}
 }
 const appContainer = document.querySelector('#app');
-render(<App />, appContainer);
+render(<Popup />, appContainer);

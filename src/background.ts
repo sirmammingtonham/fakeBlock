@@ -12,6 +12,9 @@ let textScanner: Classifier;
 (async () => {
 	imageScanner = await imageFactory.createClassifier({_: 'image'});
 	textScanner = await textFactory.createClassifier({_: 'text'});
+
+	const enabled: boolean = (await browser.storage.local.get('enabled'))?.enabled ?? true;
+	await browser.browserAction.setIcon({path: enabled ? '../assets/icon.png' : '../assets/icon_disabled.png'});
 })();
 
 // Scans image

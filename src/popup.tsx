@@ -1,3 +1,3 @@
-import App from './components/app';
+import Popup from './components/popup';
 
-export default App;
+export default Popup;

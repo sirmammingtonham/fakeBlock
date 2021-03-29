@@ -1,9 +1,11 @@
+import {browser} from 'webextension-polyfill-ts';
 import React from 'react';
 import {Grid, Avatar, IconButton, List, ListItem, ListItemAvatar, ListItemSecondaryAction, ListItemText, Typography, makeStyles, TextField} from '@material-ui/core';
 
-import EcoIcon from '@material-ui/icons/Eco.js';
+import WebIcon from '@material-ui/icons/Web.js';
 import DeleteIcon from '@material-ui/icons/Delete.js';
 import AddIcon from '@material-ui/icons/Add.js';
+
 const useStyles = makeStyles((theme: any) => ({
 	root: {
 		flexGrow: 1,
@@ -17,29 +19,50 @@ const useStyles = makeStyles((theme: any) => ({
 	}
 }));
 
-export default function WhiteList(props: any) {
+type WebsiteProps = {webs: string[]};
+
+export default function WhiteList(props: WebsiteProps) {
 	const classes = useStyles();
 	const [websites, setWebs] = React.useState(props.webs);
 	const [value, setValue] = React.useState('');
 
+	React.useEffect(() => {
+		async function setDisablelist() {
+			const disableList = (await browser.storage.local.get('whitelist'))?.whitelist ?? [];
+			setWebs(disableList);
+		}
+
+		void setDisablelist();
+	}, []);
+
 	const listWeb = () => {
-		const webs = websites;
-		const deleteWeb = (name: string) => {
+		const deleteWeb = async (name: string) => {
 			let webs: string[] = websites;
 			webs = webs.filter(object => object !== name);
 
 			setWebs(webs);
+
+			await browser.storage.local.set({
+				whitelist: webs
+			});
+			await browser.tabs.reload();
 		};
 
-		const addWeb = (name: string) => {
-			setWebs([...websites, name]);
+		const addWeb = async (name: string) => {
+			const webs = [...websites, name];
+			setWebs(webs);
+
+			await browser.storage.local.set({
+				whitelist: webs
+			});
+			await browser.tabs.reload();
 		};
 
-		const listItems = webs.map((web: string) =>
-			<ListItem>
+		const listItems = websites.map((web: string, index: number) =>
+			<ListItem key={`whitelist_${index}`}>
 				<ListItemAvatar>
 					<Avatar>
-						<EcoIcon/>
+						<WebIcon/>
 					</Avatar>
 				</ListItemAvatar>
 				<ListItemText
@@ -47,16 +70,16 @@ export default function WhiteList(props: any) {
 					secondary={null}
 				/>
 				<ListItemSecondaryAction>
-					<IconButton edge="end" aria-label="delete" onClick={() => {
-						deleteWeb(web);
+					<IconButton edge="end" aria-label="delete" onClick={ async () => {
+						await deleteWeb(web);
 					}}>
 						<DeleteIcon/>
 					</IconButton>
 				</ListItemSecondaryAction>
 			</ListItem>
 		);
-		const addButton = <IconButton edge="end" aria-label="delete" onClick={() => {
-			addWeb(value);
+		const addButton = <IconButton edge="end" aria-label="delete" onClick={ async () => {
+			await addWeb(value);
 		}}><AddIcon/></IconButton>;
 
 		const handleChange = (event: any) => {
@@ -64,7 +87,7 @@ export default function WhiteList(props: any) {
 		};
 
 		const addForm = <TextField
-			key="bruh"
+			key="whitelist_input"
 			id="standard-multiline-flexible"
 			label="e.g. Twitter.com"
 			value={value}
@@ -78,7 +101,7 @@ export default function WhiteList(props: any) {
 			<Grid container spacing={2}>
 				<Grid item xs={12} md={6}>
 					<Typography variant="h6" className={classes.title}>
-            Website Whitelist
+						Website Whitelist
 					</Typography>
 					<div className={classes.demo}>
 						<List>

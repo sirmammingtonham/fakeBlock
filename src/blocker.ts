@@ -6,9 +6,9 @@ import {Websites, pageType} from './util/page-type';
 
 // check if the extension has been enabled by the user
 (async () => {
-	const retrieved = await browser.storage.local.get('enabled');
-	const enabled = retrieved.enabled ?? true;
-	if (enabled) {
+	const enabled: boolean = (await browser.storage.local.get('enabled'))?.enabled ?? true;
+	const disabledList: string[] = (await browser.storage.local.get('whitelist'))?.whitelist ?? [];
+	if (enabled && !disabledList.includes(window.location.href)) {
 		switch (pageType(window.location.origin)) {
 			case Websites.kFacebook:
 			case Websites.kTwitter:
