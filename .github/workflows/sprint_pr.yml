@@ -1,0 +1,79 @@
+name: sprint_automation
+
+# Controls when the action will run. 
+on:
+  schedule:
+  - cron: 0 16 * * 1  # every monday at 12pm est
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  getSprintNames:
+    name: Get Sprint Names
+    runs-on: ubuntu-latest
+    outputs:
+      prev_sprint: sprint${{ steps.sprint_num.outputs.prev_sprint_num }}
+      next_sprint: sprint${{ steps.sprint_num.outputs.next_sprint_num }}
+    steps:
+      - name: Get sprint number
+        id: sprint_num
+        shell: bash
+        run: |
+          snum=$(git branch --sort=-committerdate | head -n 1)
+          echo "::set-output name=prev_sprint_num::${snum:8}"
+          echo "::set-output name=next_sprint_num::$((${num:8}+1))"
+      
+  createSprintPR:
+    name: Create Sprint PR
+    runs-on: ubuntu-latest
+    needs: getSprintNames
+    steps:
+      # Runs a single command using the runners shell
+      - name: Create pull request
+        id: pr
+        uses: peter-evans/create-pull-request@v3
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: Update report
+          committer: GitHub <noreply@github.com>
+          author: ${{ github.actor }} <${{ github.actor }}@users.noreply.github.com>
+          signoff: false
+          branch: ${{needs.getSprintNames.outputs.prev_sprint}}
+          delete-branch: true
+          title: ${{needs.getSprintNames.outputs.prev_sprint}} completed
+          body: |
+            ${{needs.getSprintNames.outputs.prev_sprint}} completed
+            - Auto-generated with GitHub Actions
+          labels: automated pr, automerge
+          assignees: sirmammingtonham, jlioanag, deanvogel, BoyuChen118
+          reviewers: sirmammingtonham, jlioanag, deanvogel, BoyuChen118
+          draft: false
+
+  mergeSprintPR:
+    name: Merge Sprint PR
+    runs-on: ubuntu-latest
+    needs: 
+      - getSprintNames
+      - createSprintPR
+    steps:
+      - name: Merge pull request
+        uses: ridedott/merge-me-action@v2
+        with:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  
+  createNewBranch:
+    name: Create branch for next sprint
+    runs-on: ubuntu-latest
+    needs:
+      - getSprintNames
+      - createSprintPR
+      - mergeSprintPR
+    steps:
+      - name: Create branch for next sprint
+        uses: peterjgrainger/action-create-branch@v2.0.1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          branch: ${{needs.getSprintNames.outputs.next_sprint}}

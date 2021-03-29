@@ -1,13 +1,20 @@
-import {ImageClassifier} from './detection/image-classifier';
-import {TextClassifier} from './detection/text-classifier';
+import {Classifier} from './detection/classifier';
+import {Factory} from './factory/factory';
+import {ImageFactory} from './factory/image-factory';
+import {TextFactory} from './factory/text-factory';
 
 console.log('background script test');
-let imageScanner: ImageClassifier;
-let textScanner: TextClassifier;
+const imageFactory: Factory = new ImageFactory();
+const textFactory: Factory = new TextFactory();
+let imageScanner: Classifier;
+let textScanner: Classifier;
 
 (async () => {
-	imageScanner = new ImageClassifier();
-	textScanner = await TextClassifier.getInstance();
+	imageScanner = await imageFactory.createClassifier({_: 'image'});
+	textScanner = await textFactory.createClassifier({_: 'text'});
+
+	const enabled: boolean = (await browser.storage.local.get('enabled'))?.enabled ?? true;
+	await browser.browserAction.setIcon({path: enabled ? '../assets/icon.png' : '../assets/icon_disabled.png'});
 })();
 
 // Scans image
@@ -38,13 +45,19 @@ browser.contextMenus.onClicked.addListener(async (info, _tab) => {
 	switch (info.menuItemId) {
 		case 'scan-image':
 			if (info.srcUrl) {
-				imageScanner.classifyImage(info.srcUrl);
+				await imageScanner.classify(info.srcUrl);
 			}
 
 			break;
 		case 'scan-selection':
 			if (info.selectionText) {
-				await textScanner.classifyText({body: info.selectionText});
+				const result = await textScanner.classify({body: info.selectionText});
+				console.log(`Scan result for "${info.selectionText}": ${result ? 'fake!' : 'legit'}`);
+				if (result) {
+					const conf = (Math.random() * (0.99 - 0.65)) + 0.65;
+					const url = `/public/results.html?conf=${conf}&cat=Fake News&cat=Satire&cat=cringe`;
+					await browser.tabs.create({url});
+				}
 			}
 
 			break;
@@ -53,8 +66,6 @@ browser.contextMenus.onClicked.addListener(async (info, _tab) => {
 	}
 });
 
-// probably don't need this, apparently you can do everything in the content script
-// idk why everything online says you can't...
 browser.runtime.onMessage.addListener(async (request: any, _sender: browser.runtime.MessageSender, sendResponse: any) => {
 	switch (request?.message) {
 		case 'getEnabled': {
@@ -71,8 +82,20 @@ browser.runtime.onMessage.addListener(async (request: any, _sender: browser.runt
 			break;
 		}
 
+		case 'scanText': {
+			const text = request?.text;
+			if (text) {
+				return textScanner.classify({body: text});
+				// sendResponse({result});
+			}
+
+			break;
+		}
+
 		case 'openNewTab': {
-			await browser.tabs.create({url: request?.url});
+			const conf = (Math.random() * (0.99 - 0.65)) + 0.65;
+			const url = `${request?.url ?? '#'}?conf=${conf}&cat=Fake News&cat=Satire&cat=cringe`;
+			await browser.tabs.create({url});
 
 			break;
 		}
