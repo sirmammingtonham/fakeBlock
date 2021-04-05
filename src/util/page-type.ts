@@ -10,7 +10,7 @@ export function pageType(url: string): Websites {
 	}
 
 	if (url.includes('facebook.com')) {
-		return Websites.kTwitter;
+		return Websites.kFacebook;
 	}
 
 	return Websites.kOther;
