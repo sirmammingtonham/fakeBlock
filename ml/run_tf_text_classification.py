@@ -31,121 +31,99 @@ from transformers import (
     EvalPrediction,
     HfArgumentParser,
     PreTrainedTokenizer,
-    TFAutoModelForSequenceClassification,
+    # TFAutoModelForSequenceClassification,
     TFTrainer,
     TFTrainingArguments,
 )
 from transformers.utils import logging as hf_logging
+
+from modeling.multi_output_distilbert import TFDistilBertForFakeNewsClassification
 
 
 hf_logging.set_verbosity_info()
 hf_logging.enable_default_handler()
 hf_logging.enable_explicit_format()
 
-
 def get_tfds(
-    train_file: str,
-    eval_file: str,
-    test_file: str,
+    path: str,
     tokenizer: PreTrainedTokenizer,
-    label_column_id: int,
     max_seq_length: Optional[int] = None,
 ):
-    files = {}
-
-    if train_file is not None:
-        files[datasets.Split.TRAIN] = [train_file]
-    if eval_file is not None:
-        files[datasets.Split.VALIDATION] = [eval_file]
-    if test_file is not None:
-        files[datasets.Split.TEST] = [test_file]
-
-    ds = datasets.load_dataset("csv", data_files=files)
-    features_name = list(ds[list(files.keys())[0]].features.keys())
-    label_name = features_name.pop(label_column_id)
-    label_list = list(set(ds[list(files.keys())[0]][label_name]))
-    label2id = {label: i for i, label in enumerate(label_list)}
+    ds = datasets.load_from_disk(path)
+    ds = ds.rename_column('aggregated_label', 'labels_aggregate').rename_column(
+        'Media Bias / Fact Check, label', 'labels_category')
     input_names = tokenizer.model_input_names
-    transformed_ds = {}
-
-    if len(features_name) == 1:
-        for k in files.keys():
-            transformed_ds[k] = ds[k].map(
-                lambda example: tokenizer.batch_encode_plus(
-                    example[features_name[0]], truncation=True, max_length=max_seq_length, padding="max_length"
-                ),
-                batched=True,
-            )
-    elif len(features_name) == 2:
-        for k in files.keys():
-            transformed_ds[k] = ds[k].map(
-                lambda example: tokenizer(
-                    example[features_name[0]], example[features_name[1]],
-                    truncation=True,
-                    max_length=max_seq_length,
-                    padding="max_length",
-                ),
-                batched=True,
-            )
+    transformed_ds = ds.map(
+        lambda example: tokenizer(
+            example['content'],
+            truncation=True,
+            max_length=max_seq_length,
+            padding="max_length",
+        ),
+        batched=True,
+    )
 
     def gen_train():
-        for ex in transformed_ds[datasets.Split.TRAIN]:
-            d = {k: v for k, v in ex.items() if k in input_names}
-            label = label2id[ex[label_name]]
-            yield (d, label)
+        for ex in transformed_ds["train"]:
+            yield {k: v for k, v in ex.items() if k in input_names}, (ex['labels_aggregate'], ex['labels_category'])
 
     def gen_val():
-        for ex in transformed_ds[datasets.Split.VALIDATION]:
-            d = {k: v for k, v in ex.items() if k in input_names}
-            label = label2id[ex[label_name]]
-            yield (d, label)
+        for ex in transformed_ds["valid"]:
+            yield {k: v for k, v in ex.items() if k in input_names}, (ex['labels_aggregate'], ex['labels_category'])
 
     def gen_test():
-        for ex in transformed_ds[datasets.Split.TEST]:
-            d = {k: v for k, v in ex.items() if k in input_names}
-            label = label2id[ex[label_name]]
-            yield (d, label)
+        for ex in transformed_ds["test"]:
+            yield {k: v for k, v in ex.items() if k in input_names}, (ex['labels_aggregate'], ex['labels_category'])
 
     train_ds = (
         tf.data.Dataset.from_generator(
             gen_train,
-            ({k: tf.int32 for k in input_names}, tf.int64),
-            ({k: tf.TensorShape([None]) for k in input_names}, tf.TensorShape([])),
+            ({k: tf.int32 for k in input_names}, (tf.int64, tf.int64)),
+            ({k: tf.TensorShape([None]) for k in input_names},
+             (tf.TensorShape([]), tf.TensorShape([]))),
         )
-        if datasets.Split.TRAIN in transformed_ds
+        if "train" in transformed_ds
         else None
     )
 
     if train_ds is not None:
-        train_ds = train_ds.apply(tf.data.experimental.assert_cardinality(len(ds[datasets.Split.TRAIN])))
+        train_ds = train_ds.apply(
+            tf.data.experimental.assert_cardinality(len(ds["train"])))
 
     val_ds = (
         tf.data.Dataset.from_generator(
             gen_val,
-            ({k: tf.int32 for k in input_names}, tf.int64),
-            ({k: tf.TensorShape([None]) for k in input_names}, tf.TensorShape([])),
+            ({k: tf.int32 for k in input_names}, (tf.int64, tf.int64)),
+            ({k: tf.TensorShape([None]) for k in input_names},
+             (tf.TensorShape([]), tf.TensorShape([]))),
         )
-        if datasets.Split.VALIDATION in transformed_ds
+        if "valid" in transformed_ds
         else None
     )
 
     if val_ds is not None:
-        val_ds = val_ds.apply(tf.data.experimental.assert_cardinality(len(ds[datasets.Split.VALIDATION])))
+        val_ds = val_ds.apply(
+            tf.data.experimental.assert_cardinality(len(ds["valid"])))
 
     test_ds = (
         tf.data.Dataset.from_generator(
             gen_test,
-            ({k: tf.int32 for k in input_names}, tf.int64),
-            ({k: tf.TensorShape([None]) for k in input_names}, tf.TensorShape([])),
+            ({k: tf.int32 for k in input_names}, (tf.int64, tf.int64)),
+            ({k: tf.TensorShape([None]) for k in input_names},
+             (tf.TensorShape([]), tf.TensorShape([]))),
         )
-        if datasets.Split.TEST in transformed_ds
+        if "test" in transformed_ds
         else None
     )
 
     if test_ds is not None:
-        test_ds = test_ds.apply(tf.data.experimental.assert_cardinality(len(ds[datasets.Split.TEST])))
+        test_ds = test_ds.apply(
+            tf.data.experimental.assert_cardinality(len(ds["test"])))
 
-    return train_ds, val_ds, test_ds, label2id
+    label_lens = (len(ds["train"].features["labels_aggregate"].names), len(
+        ds["train"].features["labels_category"].names))
+
+    return train_ds, val_ds, test_ds, label_lens
 
 
 logger = logging.getLogger(__name__)
@@ -160,13 +138,10 @@ class DataTrainingArguments:
     into argparse arguments to be able to specify them on
     the command line.
     """
-
-    label_column_id: int = field(metadata={"help": "Which column contains the label"})
-    train_file: str = field(default=None, metadata={"help": "The path of the training file"})
-    dev_file: Optional[str] = field(default=None, metadata={"help": "The path of the development file"})
-    test_file: Optional[str] = field(default=None, metadata={"help": "The path of the test file"})
+    path: str = field(default=None, metadata={
+                            "help": "The path of the training file"})
     max_seq_length: int = field(
-        default=128,
+        default=256,
         metadata={
             "help": "The maximum total input sequence length after tokenization. Sequences longer "
             "than this will be truncated, sequences shorter will be padded."
@@ -184,7 +159,8 @@ class ModelArguments:
     """
 
     model_name_or_path: str = field(
-        metadata={"help": "Path to pretrained model or model identifier from huggingface.co/models"}
+        metadata={
+            "help": "Path to pretrained model or model identifier from huggingface.co/models"}
     )
     config_name: Optional[str] = field(
         default=None, metadata={"help": "Pretrained config name or path if not the same as model_name"}
@@ -192,12 +168,14 @@ class ModelArguments:
     tokenizer_name: Optional[str] = field(
         default=None, metadata={"help": "Pretrained tokenizer name or path if not the same as model_name"}
     )
-    use_fast: bool = field(default=False, metadata={"help": "Set this flag to use fast tokenization."})
+    use_fast: bool = field(default=False, metadata={
+                           "help": "Set this flag to use fast tokenization."})
     # If you want to tweak more attributes on your tokenizer, you should do it in a distinct script,
     # or just modify its tokenizer_config.json.
     cache_dir: Optional[str] = field(
         default=None,
-        metadata={"help": "Where do you want to store the pretrained models downloaded from huggingface.co"},
+        metadata={
+            "help": "Where do you want to store the pretrained models downloaded from huggingface.co"},
     )
 
 
@@ -205,7 +183,8 @@ def main():
     # See all possible arguments in src/transformers/training_args.py
     # or by passing the --help flag to this script.
     # We now keep distinct sets of args, for a cleaner separation of concerns.
-    parser = HfArgumentParser((ModelArguments, DataTrainingArguments, TFTrainingArguments))
+    parser = HfArgumentParser(
+        (ModelArguments, DataTrainingArguments, TFTrainingArguments))
     model_args, data_args, training_args = parser.parse_args_into_dataclasses()
 
     if (
@@ -243,33 +222,31 @@ def main():
         cache_dir=model_args.cache_dir,
     )
 
-    train_dataset, eval_dataset, test_ds, label2id = get_tfds(
-        train_file=data_args.train_file,
-        eval_file=data_args.dev_file,
-        test_file=data_args.test_file,
+    train_dataset, eval_dataset, test_ds, label_lens = get_tfds(
+        path=data_args.path,
         tokenizer=tokenizer,
-        label_column_id=data_args.label_column_id,
         max_seq_length=data_args.max_seq_length,
     )
 
     config = AutoConfig.from_pretrained(
         model_args.config_name if model_args.config_name else model_args.model_name_or_path,
-        num_labels=len(label2id),
-        label2id=label2id,
-        id2label={id: label for label, id in label2id.items()},
         finetuning_task="text-classification",
         cache_dir=model_args.cache_dir,
     )
 
     with training_args.strategy.scope():
-        model = TFAutoModelForSequenceClassification.from_pretrained(
+        model = TFDistilBertForFakeNewsClassification.from_pretrained( #TFAutoModelForSequenceClassification
             model_args.model_name_or_path,
             from_pt=bool(".bin" in model_args.model_name_or_path),
             config=config,
+            num_labels_aggregate=label_lens[0],
+            num_labels_category=label_lens[1],
             cache_dir=model_args.cache_dir,
         )
 
     def compute_metrics(p: EvalPrediction) -> Dict:
+        print(p)
+        print('!!!!')
         preds = np.argmax(p.predictions, axis=1)
 
         return {"acc": (preds == p.label_ids).mean()}
@@ -294,7 +271,8 @@ def main():
     if training_args.do_eval:
         logger.info("*** Evaluate ***")
         result = trainer.evaluate()
-        output_eval_file = os.path.join(training_args.output_dir, "eval_results.txt")
+        output_eval_file = os.path.join(
+            training_args.output_dir, "eval_results.txt")
 
         with open(output_eval_file, "w") as writer:
             logger.info("***** Eval results *****")
