@@ -18,3 +18,45 @@ python run_tf_text_classification.py `
   --max_seq_length 512
 
 saved_model_cli show --dir distilbertu_ISOT --tag_set serve --signature_def serving_default
+
+python run_tf_text_classification.py `
+  --path datasets/NELA `
+  --model_name_or_path distilbert-base-uncased `
+  --output_dir model `
+  --num_train_epochs 3 `
+  --per_device_train_batch_size 16 `
+  --per_device_eval_batch_size 16 `
+  --do_train `
+  --do_eval `
+  --do_predict `
+  --logging_steps 10 `
+  --evaluation_strategy steps `
+  --save_steps 1000 `
+  --overwrite_output_dir `
+  --max_seq_length 512
+
+python run_tf_text_classification.py `
+  --path datasets/NELA `
+  --model_name_or_path distilbert-base-uncased `
+  --output_dir model `
+  --num_train_epochs 3 `
+  --per_device_train_batch_size 16 `
+  --per_device_eval_batch_size 16 `
+  --do_train `
+  --eval_steps 10000 `
+  --logging_steps 10 `
+  --evaluation_strategy steps `
+  --save_steps 10000 `
+  --max_seq_length 512
+
+
+python run_tf_text_classification.py `
+  --path datasets/NELA `
+  --model_name_or_path ./model `
+  --output_dir model `
+  --per_device_train_batch_size 16 `
+  --per_device_eval_batch_size 16 `
+  --do_eval `
+  --logging_steps 10 `
+  --max_seq_length 512
+

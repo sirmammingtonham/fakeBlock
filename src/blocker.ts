@@ -37,6 +37,8 @@ import {Websites, pageType} from './util/page-type';
 // 	});
 // }
 
+
+//sets up the html collapsible and wraps the element that is given by the input
 function createCollapsible(p: Element, index: number) {
 	const containerDiv = document.createElement('div');
 	const innerDiv = document.createElement('div');
@@ -72,6 +74,9 @@ function createCollapsible(p: Element, index: number) {
 	p.replaceWith(containerDiv);
 }
 
+// waits until the page is done loading and then collects all of the wanted elements
+// on the page that containt text and sends it through to the machine learning model
+// If the result of the ml model flags the text, then the element is wrapped in a collapsible and is 'blocked'
 async function runBlocker() {
 	// checkLinks();
 	// Replace paragraphs with collapsible divs
@@ -89,12 +94,12 @@ async function runBlocker() {
 		});
 	}));
 
-	const divArray = document.querySelectorAll('span'); // div
+	const divArray = document.querySelectorAll('span, div'); // div
 	// go through divs, try getting only divs with text in them
 	// general solution, block all divs that have no childrem, but this needs to be worked out
 	// text can have <b>(bold), <i>(italic) elements and things like that which prevent the blocking
 	await Promise.all([...divArray].map(async (p, index) => {
-		if (!p.textContent || p.textContent.split(' ').length < 15) {
+		if (!p.textContent || p.textContent.split(' ').length < 15  || p.hasChildNodes) {
 			return; // skip scanning content that doesn't look to be a complete sentence (< 15 words)
 		}
 

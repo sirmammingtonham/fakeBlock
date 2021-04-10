@@ -3,3 +3,4 @@ datasets/
 model/
 runs/
 distilbert*/
+__pycache__
