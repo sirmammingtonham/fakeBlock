@@ -12,6 +12,7 @@ import {Websites, pageType} from './util/page-type';
 		switch (pageType(window.location.origin)) {
 			case Websites.kFacebook:
 			case Websites.kTwitter:
+			case Websites.kNewsSite:
 			default:
 				setTimeout(async () => {
 					await runBlocker();
@@ -96,7 +97,7 @@ async function runBlocker() {
 
 	const divArray = document.querySelectorAll('span, div'); // div
 	// go through divs, try getting only divs with text in them
-	// general solution, block all divs that have no childrem, but this needs to be worked out
+	// general solution, block all divs that have no children, but this needs to be worked out
 	// text can have <b>(bold), <i>(italic) elements and things like that which prevent the blocking
 	await Promise.all([...divArray].map(async (p, index) => {
 		if (!p.textContent || p.textContent.split(' ').length < 15  || p.hasChildNodes) {
