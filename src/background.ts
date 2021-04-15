@@ -1,17 +1,14 @@
 import {Classifier} from './detection/classifier';
-import {Factory} from './factory/factory';
-import {ImageFactory} from './factory/image-factory';
-import {TextFactory} from './factory/text-factory';
+import {ClassifierFactory, ClassifierTypes} from './factory/classifier-factory';
 
 console.log('background script test');
-const imageFactory: Factory = new ImageFactory();
-const textFactory: Factory = new TextFactory();
+const factory: ClassifierFactory = new ClassifierFactory();
 let imageScanner: Classifier;
 let textScanner: Classifier;
 
 (async () => {
-	imageScanner = await imageFactory.createClassifier({_: 'image'});
-	textScanner = await textFactory.createClassifier({_: 'text'});
+	imageScanner = await factory.createClassifier({type: ClassifierTypes.kImage});
+	textScanner = await factory.createClassifier({type: ClassifierTypes.kText});
 
 	const enabled: boolean = (await browser.storage.local.get('enabled'))?.enabled ?? true;
 	await browser.browserAction.setIcon({path: enabled ? '../assets/icon.png' : '../assets/icon_disabled.png'});

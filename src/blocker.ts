@@ -38,8 +38,7 @@ import {Websites, pageType} from './util/page-type';
 // 	});
 // }
 
-
-//sets up the html collapsible and wraps the element that is given by the input
+// sets up the html collapsible and wraps the element that is given by the input
 function createCollapsible(p: Element, index: number) {
 	const containerDiv = document.createElement('div');
 	const innerDiv = document.createElement('div');
@@ -100,7 +99,7 @@ async function runBlocker() {
 	// general solution, block all divs that have no children, but this needs to be worked out
 	// text can have <b>(bold), <i>(italic) elements and things like that which prevent the blocking
 	await Promise.all([...divArray].map(async (p, index) => {
-		if (!p.textContent || p.textContent.split(' ').length < 15  || p.hasChildNodes) {
+		if (!p.textContent || p.textContent.split(' ').length < 15 || p.hasChildNodes) {
 			return; // skip scanning content that doesn't look to be a complete sentence (< 15 words)
 		}
 
