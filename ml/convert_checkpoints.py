@@ -1,8 +1,7 @@
 import json
 import tensorflow as tf
 from tensorflowjs.converters import convert_tf_saved_model
-from transformers import TFDistilBertForSequenceClassification
-from modeling.multi_output_distilbert import TFDistilBertForFakeNewsClassification
+from modeling.multi_output_distilbert import TFDistilBertForFakeNewsClassification # type: ignore
 
 
 def main():
