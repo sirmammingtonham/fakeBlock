@@ -41,7 +41,7 @@ export class TextClassifier extends Classifier {
 			selection.headline ? selection.headline + ' ' + selection.body : selection.body
 		);
 
-		tf.engine().startScope();
+		tf.engine().startScope(); // scope our tensors to automatically dispose and prevent mem leaks
 
 		const inputTensor = tf.tensor(inputIds, undefined, 'int32').expandDims(0);
 		const maskTensor = tf.tensor(inputMask, undefined, 'int32').expandDims(0);

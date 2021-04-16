@@ -49,10 +49,11 @@ browser.contextMenus.onClicked.addListener(async (info, _tab) => {
 		case 'scan-selection':
 			if (info.selectionText) {
 				const result = await textScanner.classify({body: info.selectionText});
-				// console.log(`Scan result for "${info.selectionText}": ${result ? 'fake!' : 'legit'}`);
 				if (result) {
-					const conf = (Math.random() * (0.99 - 0.65)) + 0.65;
-					const url = `/public/results.html?conf=${conf}&cat=Fake News&cat=Satire&cat=cringe`;
+					// const conf = (Math.random() * (0.99 - 0.65)) + 0.65;
+					const url = `/public/results.html?res=${
+						encodeURIComponent(JSON.stringify(result))
+					}`;
 					await browser.tabs.create({url});
 				}
 			}

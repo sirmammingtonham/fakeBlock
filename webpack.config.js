@@ -12,8 +12,8 @@ module.exports = {
 	entry: {
 		background: './src/background.ts',
 		blocker: './src/blocker.ts',
-		popup: './src/popup.tsx',
-		results: './src/results.tsx'
+		popup: './src/components/popup.tsx',
+		results: './src/components/result.tsx'
 	},
 	output: {
 		path: path.join(__dirname, 'dist'),
