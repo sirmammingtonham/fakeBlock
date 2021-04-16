@@ -136,9 +136,9 @@ export class BertTokenizer {
 		// converts single example to feature input. This is derived from:
 		// https://github.com/google-research/bert/blob/88a817c37f788702a363ff935fd173b6dc6ac0d6/run_classifier.py#L377-L476
 
-		const inputIds: number[] = [];
-		const inputMask: number[] = [];
-		const segmentIds: number[] = [];
+		let inputIds: number[] = [];
+		let inputMask: number[] = [];
+		let segmentIds: number[] = [];
 		const tokenIds = this.tokenize(text);
 
 		inputIds.push(this.clsId);
@@ -163,10 +163,12 @@ export class BertTokenizer {
 			segmentIds.push(0);
 		}
 
-		// console.log('input_ids: ', inputIds);
-		// console.log('input_mask: ', inputMask);
-		// console.log('segmentIds: ', segmentIds);
-		// console.log('tokens: ', this.convertIdsToTokens(inputIds));
+		if (inputIds.length > this.maxSeqLength) {
+			inputIds = inputIds.slice(0, this.maxSeqLength + 1);
+			inputMask = inputMask.slice(0, this.maxSeqLength + 1);
+			segmentIds = segmentIds.slice(0, this.maxSeqLength + 1);
+		}
+
 		return {inputIds, segmentIds, inputMask};
 	}
 }

@@ -3,6 +3,7 @@ import '../style/blocker.scss';
 // import * as CJRIndex from '../assets/cjrindex.json';
 import {browser} from 'webextension-polyfill-ts';
 import {Websites, pageType} from './util/page-type';
+import {ClassifierOutput, AggregateLabels} from './detection/classifier';
 
 // check if the extension has been enabled by the user
 (async () => {
@@ -59,7 +60,6 @@ function createCollapsible(p: Element, index: number) {
 	resultsLink.innerHTML = 'See why we\'ve blocked this!';
 
 	resultsLink.addEventListener('click', async () => {
-		console.log('pls');
 		await browser.runtime.sendMessage({message: 'openNewTab', url: '/public/results.html'});
 	});
 
@@ -88,23 +88,24 @@ async function runBlocker() {
 		}
 
 		return browser.runtime.sendMessage({message: 'scanText', text: p.textContent}).then(result => {
-			if (result) {
+			// should maybe have it so if aggregate is mixed, text is highlighted but not blocked
+			if (result && result.valueAggregate !== AggregateLabels.reliable) {
 				createCollapsible(p, index);
 			}
 		});
 	}));
 
-	const divArray = document.querySelectorAll('span, div'); // div
+	const divArray = document.querySelectorAll('span'); // div
 	// go through divs, try getting only divs with text in them
 	// general solution, block all divs that have no children, but this needs to be worked out
 	// text can have <b>(bold), <i>(italic) elements and things like that which prevent the blocking
 	await Promise.all([...divArray].map(async (p, index) => {
-		if (!p.textContent || p.textContent.split(' ').length < 15 || p.hasChildNodes) {
+		if (!p.textContent || p.textContent.split(' ').length < 15) { // || p.hasChildNodes
 			return; // skip scanning content that doesn't look to be a complete sentence (< 15 words)
 		}
 
-		return browser.runtime.sendMessage({message: 'scanText', text: p.textContent}).then(result => {
-			if (result) {
+		return browser.runtime.sendMessage({message: 'scanText', text: p.textContent}).then((result: ClassifierOutput) => {
+			if (result && result.valueAggregate !== AggregateLabels.reliable) {
 				createCollapsible(p, index);
 			}
 		});

@@ -50,7 +50,7 @@ module.exports = {
 				from: './public/*'
 			},
 			{
-				from: './ml/distilbert_ISOT',
+				from: './ml/distilbert_nela_js',
 				to: 'distilbert'
 			}
 		]),

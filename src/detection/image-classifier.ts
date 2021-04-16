@@ -1,4 +1,4 @@
-import {Classifier} from './classifier';
+import {Classifier, ClassifierOutput} from './classifier';
 export class ImageClassifier extends Classifier {
 	private static instance: ImageClassifier;
 
@@ -15,8 +15,8 @@ export class ImageClassifier extends Classifier {
 		return ImageClassifier.instance;
 	}
 
-	public async classify(url: string): Promise<boolean> {
+	public async classify(url: string): Promise<ClassifierOutput> {
 		console.log(url);
-		return true;
+		return undefined;
 	}
 }
