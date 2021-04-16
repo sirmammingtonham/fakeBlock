@@ -1,6 +1,4 @@
 import '../style/blocker.scss';
-// import $ from 'jquery';
-// import * as CJRIndex from '../assets/cjrindex.json';
 import {browser} from 'webextension-polyfill-ts';
 import {Websites, pageType} from './util/page-type';
 import {ClassifierOutput, AggregateLabels} from './detection/classifier';
@@ -22,25 +20,8 @@ import {ClassifierOutput, AggregateLabels} from './detection/classifier';
 	}
 })();
 
-// function checkLinks() {
-// 	const domainRegex = /^(?:https?:\/\/)?(?:[^@\n]+@)?(?:www\.)?([^:/\n?]+)/;
-// 	// should make this look nicer
-// 	$('a').each(function (this: any) {
-// 		const subDomain: keyof typeof CJRIndex = this.href.match(domainRegex)[1];
-// 		// these websites have a million links to themselves,
-// 		// should ignore otherwise page will get bloated with warnings
-// 		const shouldSkip = window.location.origin.includes(subDomain);
-// 		if (!shouldSkip && subDomain in CJRIndex) {
-// 			const indexEntry = CJRIndex[subDomain];
-// 			console.log('found sketchy link!');
-// 			$(this).addClass('linkSus');
-// 			$(this).append(`<span class="linkSusText">Link's website reported as ${indexEntry.categories as unknown as string}!</span>`);
-// 		}
-// 	});
-// }
-
 // sets up the html collapsible and wraps the element that is given by the input
-function createCollapsible(p: Element, index: number) {
+function createCollapsible(p: Element, index: number, result: ClassifierOutput) {
 	const containerDiv = document.createElement('div');
 	const innerDiv = document.createElement('div');
 	innerDiv.classList.add('block', 'collapse', `_${index}`);
@@ -60,7 +41,7 @@ function createCollapsible(p: Element, index: number) {
 	resultsLink.innerHTML = 'See why we\'ve blocked this!';
 
 	resultsLink.addEventListener('click', async () => {
-		await browser.runtime.sendMessage({message: 'openNewTab', url: '/public/results.html'});
+		await browser.runtime.sendMessage({message: 'openNewTab', url: '/public/results.html', result});
 	});
 
 	hiddenContent.append(document.createElement('br'));
@@ -90,7 +71,7 @@ async function runBlocker() {
 		return browser.runtime.sendMessage({message: 'scanText', text: p.textContent}).then(result => {
 			// should maybe have it so if aggregate is mixed, text is highlighted but not blocked
 			if (result && result.valueAggregate !== AggregateLabels.reliable) {
-				createCollapsible(p, index);
+				createCollapsible(p, index, result);
 			}
 		});
 	}));
@@ -106,7 +87,7 @@ async function runBlocker() {
 
 		return browser.runtime.sendMessage({message: 'scanText', text: p.textContent}).then((result: ClassifierOutput) => {
 			if (result && result.valueAggregate !== AggregateLabels.reliable) {
-				createCollapsible(p, index);
+				createCollapsible(p, index, result);
 			}
 		});
 	}));

@@ -1,4 +1,4 @@
-import {Classifier} from './detection/classifier';
+import {Classifier, ClassifierOutput} from './detection/classifier';
 import {ClassifierFactory, ClassifierTypes} from './factory/classifier-factory';
 
 console.log('background script test');
@@ -13,6 +13,15 @@ let textScanner: Classifier;
 	const enabled: boolean = (await browser.storage.local.get('enabled'))?.enabled ?? true;
 	await browser.browserAction.setIcon({path: enabled ? '../assets/icon.png' : '../assets/icon_disabled.png'});
 })();
+
+async function createResultPage(result: ClassifierOutput) {
+	if (result) {
+		const url = `/public/results.html?res=${
+			encodeURIComponent(JSON.stringify(result))
+		}`;
+		await browser.tabs.create({url});
+	}
+}
 
 // Scans image
 browser.contextMenus.create(
@@ -49,13 +58,7 @@ browser.contextMenus.onClicked.addListener(async (info, _tab) => {
 		case 'scan-selection':
 			if (info.selectionText) {
 				const result = await textScanner.classify({body: info.selectionText});
-				if (result) {
-					// const conf = (Math.random() * (0.99 - 0.65)) + 0.65;
-					const url = `/public/results.html?res=${
-						encodeURIComponent(JSON.stringify(result))
-					}`;
-					await browser.tabs.create({url});
-				}
+				await createResultPage(result);
 			}
 
 			break;
@@ -91,9 +94,10 @@ browser.runtime.onMessage.addListener(async (request: any, _sender: browser.runt
 		}
 
 		case 'openNewTab': {
-			const conf = (Math.random() * (0.99 - 0.65)) + 0.65;
-			const url = `${request?.url ?? '#'}?conf=${conf}&cat=Fake News&cat=Satire&cat=cringe`;
-			await browser.tabs.create({url});
+			const result = request?.result;
+			if (result) {
+				await createResultPage(result);
+			}
 
 			break;
 		}
