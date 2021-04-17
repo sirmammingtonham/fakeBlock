@@ -10,6 +10,14 @@ let textScanner: Classifier;
 	imageScanner = await factory.createClassifier({type: ClassifierTypes.kImage});
 	textScanner = await factory.createClassifier({type: ClassifierTypes.kText});
 
+	if (!imageScanner) {
+		console.error('Couldn\'t get image scanner!');
+	}
+
+	if (!textScanner) {
+		console.error('Couldn\'t get text scanner!');
+	}
+
 	const enabled: boolean = (await browser.storage.local.get('enabled'))?.enabled ?? true;
 	await browser.browserAction.setIcon({path: enabled ? '../assets/icon.png' : '../assets/icon_disabled.png'});
 })();

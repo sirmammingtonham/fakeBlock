@@ -1,19 +1,19 @@
-import * as tf from '@tensorflow/tfjs';
+// import * as tf from '@tensorflow/tfjs';
 
 export enum AggregateLabels {
 	reliable, mixed, unreliable
 }
 
 export enum CategoryLabels {
-	conspiracyPseudoscience, leastBiased, leftBias, leftCenterBias, questionableSource, rightBias, rightCenterBias, NA
+	conspiracyPseudoscience, unBiased, leftBias, leftCenterBias, questionableSource, rightBias, rightCenterBias, NA
 }
 
 /// interface to wrap results from classifier models
 export interface Output {
-	logitsAggregate: tf.TypedArray;
-	logitsCategory: tf.TypedArray;
-	probsAggregate: tf.TypedArray;
-	probsCategory: tf.TypedArray;
+	logitsAggregate: number[];
+	logitsCategory: number[];
+	probsAggregate: number[];
+	probsCategory: number[];
 	valueAggregate: AggregateLabels;
 	valueCategory: CategoryLabels;
 }

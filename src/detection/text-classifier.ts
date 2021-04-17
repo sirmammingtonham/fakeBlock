@@ -60,10 +60,10 @@ export class TextClassifier extends Classifier {
 			const valueCategories = tf.argMax(predCategories, 1);
 
 			output = {
-				logitsAggregate: await aggregate.data(),
-				logitsCategory: await categories.data(),
-				probsAggregate: await predAggregate.data(),
-				probsCategory: await predCategories.data(),
+				logitsAggregate: [...await aggregate.data()],
+				logitsCategory: [...await categories.data()],
+				probsAggregate: [...await predAggregate.data()],
+				probsCategory: [...await predCategories.data()],
 				valueAggregate: (await valueAggregate.data())[0]!,
 				valueCategory: (await valueCategories.data())[0]!
 			};
