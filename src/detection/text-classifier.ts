@@ -1,29 +1,40 @@
-import {Classifier, ClassifierOutput} from './classifier';
+import {Classifier, ClassifierOutput, ClassifierInput} from './classifier';
 import * as tf from '@tensorflow/tfjs';
 import * as bert from './tokenizer/bert-tokenizer';
 
-export interface ArticleData {
-	headline?: string;
-	body: string;
-}
-
-/// our text classifier
-/// loads the tensorflow model and exposes the classify function
+/**
+ * Our fake-news text classifier
+ * Loads our custom distilbert tensorflow model and exposes the classify function
+ *
+ * @extends Classifier
+ */
 export class TextClassifier extends Classifier {
 	private static instance: TextClassifier;
 	private model!: tf.GraphModel;
 	private tokenizer!: bert.BertTokenizer;
 
+	/**
+	 * Private constructor since we use factory, no custom functionality
+	 */
 	private constructor() {
 		super();
 		console.log('TextClassifier instance created');
 	}
 
+	/**
+	 * Static getter for model path
+	 *
+	 * @returns Path to model
+	 */
 	private static get modelPath() {
 		return './distilbert/model.json';
 	}
 
-	/// factory creation method
+	/**
+	 * Factory creation method for TextClassifier
+	 *
+	 * @returns Promise that resolves to new or existing instance of TextClassifier
+	 */
 	public static async create(): Promise<TextClassifier> {
 		if (TextClassifier.instance === undefined) {
 			TextClassifier.instance = new TextClassifier();
@@ -34,9 +45,13 @@ export class TextClassifier extends Classifier {
 		return TextClassifier.instance;
 	}
 
-	/// takes input ArticleData, tokenizes it, then feeds it through neural net
-	/// returns prediction (true if fake, false if legit)
-	public async classify(selection: ArticleData): Promise<ClassifierOutput> {
+	/**
+	 * takes input ArticleData, tokenizes it, then feeds it through neural net
+	 *
+	 * @param selection The data from the selected input article
+	 * @returns Promise that resolves to ClassifierOutput containing data from inference
+	 */
+	public async classify(selection: ClassifierInput): Promise<ClassifierOutput> {
 		const {inputIds, inputMask} = this.tokenizer.convertSingleExample(
 			selection.headline ? selection.headline + ' ' + selection.body : selection.body
 		);
@@ -59,6 +74,7 @@ export class TextClassifier extends Classifier {
 			const valueAggregate = tf.argMax(predAggregate, 1);
 			const valueCategories = tf.argMax(predCategories, 1);
 
+			// convert tensors to number[] and setup output var
 			output = {
 				logitsAggregate: [...await aggregate.data()],
 				logitsCategory: [...await categories.data()],

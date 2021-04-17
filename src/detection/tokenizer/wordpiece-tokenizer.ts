@@ -1,6 +1,9 @@
 import * as vocab from './vocab.json';
 type Child = Record<string, TrieNode>;
 
+/**
+ * Trie node
+ */
 class TrieNode {
 	key: string | null;
 	parent: TrieNode | null;
@@ -31,6 +34,9 @@ class TrieNode {
 	}
 }
 
+/**
+ * Simple trie class
+ */
 class Trie {
 	root: TrieNode | undefined;
 
@@ -75,6 +81,11 @@ class Trie {
 	}
 }
 
+/**
+ * WordPieceTokenizer class
+ * Converts strings to token ids for use in neural network (using a trie)
+ * https://arxiv.org/abs/1609.08144v2
+ */
 export default class WordPieceTokenizer {
 	separator: string;
 	UNK_INDEX: number;
@@ -86,7 +97,10 @@ export default class WordPieceTokenizer {
 		this.UNK_INDEX = 100;
 	}
 
-	load() {
+	/**
+	 * loads vocab from json, parses it into trie
+	 */
+	public load() {
 		this.vocab = vocab;
 		this.trie = new Trie();
 		this.trie.insert('[CLS]', 1, 101);
@@ -101,12 +115,12 @@ export default class WordPieceTokenizer {
 		}
 	}
 
-	// loadVocab(vocabUrl: string) {
-	// 	const json = fs.readFileSync(vocabUrl, 'utf-8');
-	// 	return JSON.parse(json);
-	// }
-
-	processInput(text: string) {
+	/**
+	 * splits input string into array of unicode normalized words with separator
+	 * @param text input text
+	 * @returns array of words with added special tokens
+	 */
+	public processInput(text: string) {
 		const words = text.split(' ');
 		return words.map(word => {
 			if (word !== '[CLS]' && word !== '[SEP]') {
@@ -117,7 +131,12 @@ export default class WordPieceTokenizer {
 		});
 	}
 
-	tokenize(text: string) {
+	/**
+	 * tokenizes input string into an array of token ids
+	 * @param text input text
+	 * @returns array of token ids
+	 */
+	public tokenize(text: string) {
 		// Source:
 		// https://github.com/google-research/bert/blob/88a817c37f788702a363ff935fd173b6dc6ac0d6/tokenization.py#L311
 		let outputTokens: number[] = [];

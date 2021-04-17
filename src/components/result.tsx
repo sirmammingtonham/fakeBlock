@@ -153,15 +153,11 @@ export default class Result extends React.Component {
 
 		const aggregateConfidence = (result.probsAggregate[result.valueAggregate]! * 100).toFixed(2);
 
-		const style = {
-			color: '#DB7093'
-		};
-
 		return (
 			<div>
 				<Container maxWidth="sm">
 					{/* <h1>The text was blocked for the following reasons.</h1> */}
-					<h1>fakeBlock is {aggregateConfidence}% confident that the text is <span style={style}> {this.camelCaseToNormal(AggregateLabels[result.valueAggregate])}</span></h1>
+					<h1>fakeBlock is {aggregateConfidence}% confident that the text is <span style={ {color: 'hsl(340, 100%, 67%)'} }> {this.camelCaseToNormal(AggregateLabels[result.valueAggregate])}</span></h1>
 				</Container>
 				<Container maxWidth="sm">
 					<h1>We flagged the text with the following tags:</h1>
