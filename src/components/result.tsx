@@ -1,10 +1,10 @@
 // import {browser} from 'webextension-polyfill-ts';
 import React from 'react';
 import {render} from 'react-dom';
-import {Chip, Container, Box} from '@material-ui/core';
+import {Chip, Container} from '@material-ui/core';
 import {Warning, Error} from '@material-ui/icons';
 import {AggregateLabels, CategoryLabels} from '../detection/classifier';
-import {Doughnut, Polar} from 'react-chartjs-2';
+import {Bar, Doughnut, Polar} from 'react-chartjs-2';
 import '../../style/result.scss';
 
 interface ClassifierOutput {
@@ -82,21 +82,93 @@ export default class Result extends React.Component {
 			]
 		};
 
+		const logitsAggregateData = {
+			labels: Object.values(AggregateLabels).slice(0, 3),
+			datasets: [
+				{
+					type: 'line',
+					label: 'Line',
+					data: result.logitsAggregate
+				},
+				{
+					type: 'bar',
+					label: 'Bar',
+					data: result.logitsAggregate,
+					backgroundColor: [
+						'rgba(255, 206, 86, 1)',
+						'rgba(54, 162, 235, 1)',
+						'rgba(255, 99, 132, 1)'
+					]
+				}
+			]
+		};
+
+		const logitsCategoryData = {
+			labels: Object.values(CategoryLabels).slice(0, 8),
+			datasets: [
+				{
+					type: 'line',
+					label: 'Line',
+					data: result.logitsCategory,
+					borderColor: [
+						'rgb(255, 99, 132)',
+						'rgb(255, 159, 64)',
+						'rgb(255, 205, 86)',
+						'rgb(75, 192, 192)',
+						'rgb(54, 162, 235)',
+						'rgb(153, 102, 255)',
+						'rgb(88, 199, 200)',
+						'rgb(201, 203, 207)'
+					],
+					borderWidth: 1
+				},
+				{
+					type: 'bar',
+					label: 'Bar',
+					data: result.logitsCategory,
+					backgroundColor: [
+						'rgba(255, 99, 132, 1)',
+						'rgba(255, 159, 64, 1)',
+						'rgba(255, 205, 86, 1)',
+						'rgba(75, 192, 192, 1)',
+						'rgba(54, 162, 235, 1)',
+						'rgba(153, 102, 255, 1)',
+						'rgba(88, 199, 200, 1)',
+						'rgba(201, 203, 207, 1)'
+					],
+					borderColor: [
+						'rgb(255, 99, 132)',
+						'rgb(255, 159, 64)',
+						'rgb(255, 205, 86)',
+						'rgb(75, 192, 192)',
+						'rgb(54, 162, 235)',
+						'rgb(153, 102, 255)',
+						'rgb(88, 199, 200)',
+						'rgb(201, 203, 207)'
+					],
+					borderWidth: 1
+				}
+			]
+		};
+
 		const aggregateConfidence = (result.probsAggregate[result.valueAggregate]! * 100).toFixed(2);
+
+		const style = {
+			color: '#DB7093'
+		};
 
 		return (
 			<div>
 				<Container maxWidth="sm">
-					<h1>The text was blocked for the following reasons.</h1>
+					{/* <h1>The text was blocked for the following reasons.</h1> */}
+					<h1>fakeBlock is {aggregateConfidence}% confident that the text is <span style={style}> {this.camelCaseToNormal(AggregateLabels[result.valueAggregate])}</span></h1>
 				</Container>
 				<Container maxWidth="sm">
+					<h1>We flagged the text with the following tags:</h1>
 					{chips}
 				</Container>
 				<Container maxWidth="sm">
 					<h1>Here are some stats you may be interested in:</h1>
-					<Box>
-						<h2>fakeBlock is {aggregateConfidence}% confident that the text is {this.camelCaseToNormal(AggregateLabels[result.valueAggregate])}</h2>
-					</Box>
 				</Container>
 				<Container maxWidth="sm">
 					<h2>Reliability Probability Breakdown</h2>
@@ -105,6 +177,14 @@ export default class Result extends React.Component {
 				<Container maxWidth="sm">
 					<h2>Category Probability Breakdown</h2>
 					<Polar data={categoryData} />
+				</Container>
+				<Container maxWidth="sm">
+					<h2>Aggregate Logits Breakdown</h2>
+					<Bar data={logitsAggregateData} />
+				</Container>
+				<Container maxWidth="sm">
+					<h2>Category Logits Breakdown</h2>
+					<Bar data={logitsCategoryData} />
 				</Container>
 			</div>
 		);
