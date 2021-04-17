@@ -47,12 +47,6 @@ export default class Result extends React.Component {
 						'rgba(54, 162, 235, 1)',
 						'rgba(255, 99, 132, 1)'
 					]
-					// borderColor: [
-					// 	'rgba(255, 99, 132, 1)',
-					// 	'rgba(54, 162, 235, 1)',
-					// 	'rgba(255, 206, 86, 1)'
-					// ],
-					// borderWidth: 1
 				}
 			]
 		};
@@ -88,6 +82,8 @@ export default class Result extends React.Component {
 			]
 		};
 
+		const aggregateConfidence = (result.probsAggregate[result.valueAggregate]! * 100).toFixed(2);
+
 		return (
 			<div>
 				<Container maxWidth="sm">
@@ -99,13 +95,17 @@ export default class Result extends React.Component {
 				<Container maxWidth="sm">
 					<h1>Here are some stats you may be interested in:</h1>
 					<Box>
-						<h3>Percent Confidence: {result.probsAggregate[result.valueAggregate]}</h3>
+						<h2>fakeBlock is {aggregateConfidence}% confident that the text is {this.camelCaseToNormal(AggregateLabels[result.valueAggregate])}</h2>
 					</Box>
 				</Container>
-				<div className="graph-container">
+				<Container maxWidth="sm">
+					<h2>Reliability Probability Breakdown</h2>
 					<Doughnut data={aggregateData} />
+				</Container>
+				<Container maxWidth="sm">
+					<h2>Category Probability Breakdown</h2>
 					<Polar data={categoryData} />
-				</div>
+				</Container>
 			</div>
 		);
 	}
