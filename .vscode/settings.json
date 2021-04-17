@@ -2,6 +2,5 @@
     "xo.enable": true,
     "xo.format.enable": true,
     "editor.insertSpaces": false,
-    "editor.defaultFormatter": "samverschueren.linter-xo",
-    "python.pythonPath": "F:\\conda\\envs\\fakeblock\\python.exe"
+    "editor.defaultFormatter": "samverschueren.linter-xo"
 }

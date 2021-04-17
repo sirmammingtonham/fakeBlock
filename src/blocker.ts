@@ -2,6 +2,7 @@ import '../style/blocker.scss';
 import {browser} from 'webextension-polyfill-ts';
 import {Websites, pageType} from './util/page-type';
 import {ClassifierOutput, AggregateLabels} from './detection/classifier';
+// import {AnyInputs} from '@tensorflow/tfjs-core';
 
 // check if the extension has been enabled by the user
 (async () => {
@@ -14,7 +15,8 @@ import {ClassifierOutput, AggregateLabels} from './detection/classifier';
 			case Websites.kNewsSite:
 			default:
 				setTimeout(async () => {
-					await runBlocker();
+					const count = await runBlocker();
+					await browser.storage.local.set({ct: count});
 				}, 1000); // wait 1 sec for page to load
 		}
 	}
@@ -62,6 +64,7 @@ async function runBlocker() {
 	// checkLinks();
 	// Replace paragraphs with collapsible divs
 	// Add support later for other tags
+	let count = 0;
 	const elementArray = document.querySelectorAll('p,h1,h2,h3,h4,h5,h6,dd,li,text');
 	await Promise.all([...elementArray].map(async (p, index) => {
 		if (!p.textContent || p.textContent.split(' ').length < 15) {
@@ -72,6 +75,7 @@ async function runBlocker() {
 			// should maybe have it so if aggregate is mixed, text is highlighted but not blocked
 			if (result && result.valueAggregate !== AggregateLabels.reliable) {
 				createCollapsible(p, index, result);
+				count += 1;
 			}
 		});
 	}));
@@ -88,6 +92,7 @@ async function runBlocker() {
 		return browser.runtime.sendMessage({message: 'scanText', text: p.textContent}).then((result: ClassifierOutput) => {
 			if (result && result.valueAggregate !== AggregateLabels.reliable) {
 				createCollapsible(p, index, result);
+				count += 1;
 			}
 		});
 	}));
@@ -115,5 +120,16 @@ async function runBlocker() {
 		}
 	};
 
+	// browser.runtime.onMessage.addListener(
+	// 	async (message: any) => {
+	// 		switch (message.type) {
+	// 			case 'getCount':
+	// 				return Promise.resolve(count);
+	// 			default:
+	// 				return Promise.resolve('problem with counting collapsible');
+	// 		}
+	// 	}
+	// );
 	console.log('blocker running in page!');
+	return count;
 }
