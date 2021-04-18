@@ -17,6 +17,12 @@ interface ClassifierOutput {
 }
 
 export default class Result extends React.Component {
+	/**
+	 *
+	 * Creates tags and charts from classifier output
+	 *
+	 * @returns results page
+	 */
 	public render() {
 		const parameters = new URLSearchParams(window.location.search);
 		const rawResult = parameters.get('res');
@@ -25,7 +31,9 @@ export default class Result extends React.Component {
 		}
 
 		const result: ClassifierOutput = JSON.parse(rawResult);
+		const aggregateConfidence = (result.probsAggregate[result.valueAggregate]! * 100).toFixed(2);
 
+		// Creates chips from aggregate and category labels for the specified result
 		const chips = [];
 		chips.push(<Chip color="secondary" label={this.camelCaseToNormal(AggregateLabels[result.valueAggregate])} icon={<Error />} />, <span>&nbsp;&nbsp;</span>);
 
@@ -36,6 +44,7 @@ export default class Result extends React.Component {
 			}
 		}
 
+		// Data for Aggregates
 		const aggregateData = {
 			labels: Object.values(AggregateLabels).slice(0, 3),
 			datasets: [
@@ -51,6 +60,7 @@ export default class Result extends React.Component {
 			]
 		};
 
+		// Data for Categories
 		const categoryData = {
 			labels: Object.values(CategoryLabels).slice(0, 8),
 			datasets: [
@@ -82,6 +92,7 @@ export default class Result extends React.Component {
 			]
 		};
 
+		// Data for Aggregate Logits
 		const logitsAggregateData = {
 			labels: Object.values(AggregateLabels).slice(0, 3),
 			datasets: [
@@ -103,6 +114,7 @@ export default class Result extends React.Component {
 			]
 		};
 
+		// Data for Categorical Logits
 		const logitsCategoryData = {
 			labels: Object.values(CategoryLabels).slice(0, 8),
 			datasets: [
@@ -151,8 +163,6 @@ export default class Result extends React.Component {
 			]
 		};
 
-		const aggregateConfidence = (result.probsAggregate[result.valueAggregate]! * 100).toFixed(2);
-
 		return (
 			<div>
 				<Container maxWidth="sm">
@@ -186,6 +196,13 @@ export default class Result extends React.Component {
 		);
 	}
 
+	/**
+	 *
+	 * Utility function for formatting classifier tags to be more legible
+	 *
+	 * @param input a string
+	 * @returns an empty string if input is null; otherwise, returns a noncamelCase string
+	 */
 	private camelCaseToNormal(input: string | undefined) {
 		if (!input) {
 			return '';
