@@ -1,11 +1,12 @@
 // import {browser} from 'webextension-polyfill-ts';
 import React from 'react';
+import ReactTooltip from 'react-tooltip';
+import styles from '../../style/result.scss';
 import {render} from 'react-dom';
 import {Chip, Container} from '@material-ui/core';
-import {Warning, Error} from '@material-ui/icons';
+import {Warning, Error, Info} from '@material-ui/icons';
 import {AggregateLabels, CategoryLabels} from '../detection/classifier';
 import {Bar, Doughnut, Polar} from 'react-chartjs-2';
-import '../../style/result.scss';
 
 interface ClassifierOutput {
 	logitsAggregate: number[];
@@ -167,7 +168,9 @@ export default class Result extends React.Component {
 			<div>
 				<Container maxWidth="sm">
 					{/* <h1>The text was blocked for the following reasons.</h1> */}
-					<h1>fakeBlock is {aggregateConfidence}% confident that the text is <span style={ {color: 'hsl(340, 100%, 67%)'} }> {this.camelCaseToNormal(AggregateLabels[result.valueAggregate])}</span></h1>
+					<h1 style={{textAlign: 'center'}}>fakeBlock is {aggregateConfidence}% confident that the text is <br/>
+						<span className={styles.color__secondary}> {this.camelCaseToNormal(AggregateLabels[result.valueAggregate])}</span>
+					</h1>
 				</Container>
 				<Container maxWidth="sm">
 					<h1>We flagged the text with the following tags:</h1>
@@ -177,21 +180,46 @@ export default class Result extends React.Component {
 					<h1>Here are some stats you may be interested in:</h1>
 				</Container>
 				<Container maxWidth="sm">
-					<h2>Reliability Probability Breakdown</h2>
-					<Doughnut data={aggregateData} />
+					<div className={styles.graph__header}>
+						<h2>Reliability Probability Breakdown &nbsp;</h2>
+						<Info
+							data-for="global-tooltip"
+							data-tip="Neural Network Probability Outputs for Reliability Classes"
+						/>
+						<Doughnut data={aggregateData} />
+					</div>
 				</Container>
 				<Container maxWidth="sm">
-					<h2>Category Probability Breakdown</h2>
-					<Polar data={categoryData} />
+					<div className={styles.graph__header}>
+						<h2>Category Probability Breakdown &nbsp;</h2>
+						<Info
+							data-for="global-tooltip"
+							data-tip="Neural Network Probability Outputs for Category Classes"
+						/>
+						<Polar data={categoryData} />
+					</div>
 				</Container>
 				<Container maxWidth="sm">
-					<h2>Aggregate Logits Breakdown</h2>
+					<div className={styles.graph__header}>
+						<h2>Aggregate Logits Breakdown&nbsp;</h2>
+						<Info
+							data-for="global-tooltip"
+							data-tip="Raw Neural Network Outputs for Reliability Classes (aggregate)"
+						/>
+					</div>
 					<Bar data={logitsAggregateData} />
 				</Container>
 				<Container maxWidth="sm">
-					<h2>Category Logits Breakdown</h2>
+					<div className={styles.graph__header}>
+						<h2>Category Logits Breakdown&nbsp;</h2>
+						<Info
+							data-for="global-tooltip"
+							data-tip="Raw Neural Network Outputs for Category Classes"
+						/>
+					</div>
 					<Bar data={logitsCategoryData} />
 				</Container>
+				<ReactTooltip id="global-tooltip" effect="solid"/>
 			</div>
 		);
 	}

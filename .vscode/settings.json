@@ -2,5 +2,7 @@
     "xo.enable": true,
     "xo.format.enable": true,
     "editor.insertSpaces": false,
-    "editor.defaultFormatter": "samverschueren.linter-xo"
+    "[typescript]": {
+        "editor.defaultFormatter": "samverschueren.linter-xo"
+    }
 }

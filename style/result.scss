@@ -1,4 +1,4 @@
-.graph-container {
+.graph__container {
 	margin: auto;
 	width: 50%;
 	display: flex;
@@ -8,6 +8,12 @@
 	}
 }
 
-.color-secondary {
+.graph__header {
+	display: flex;
+	align-items: center;
+	flex-wrap: wrap;
+}
+
+.color__secondary {
 	color: hsl(340, 100%, 67%);
 }
