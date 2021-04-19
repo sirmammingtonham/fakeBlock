@@ -1,21 +1,35 @@
-import {Classifier} from './detection/classifier';
-import {Factory} from './factory/factory';
-import {ImageFactory} from './factory/image-factory';
-import {TextFactory} from './factory/text-factory';
+import {Classifier, ClassifierOutput} from './detection/classifier';
+import {ClassifierFactory, ClassifierTypes} from './factory/classifier-factory';
 
 console.log('background script test');
-const imageFactory: Factory = new ImageFactory();
-const textFactory: Factory = new TextFactory();
+const factory: ClassifierFactory = new ClassifierFactory();
 let imageScanner: Classifier;
 let textScanner: Classifier;
 
 (async () => {
-	imageScanner = await imageFactory.createClassifier({_: 'image'});
-	textScanner = await textFactory.createClassifier({_: 'text'});
+	imageScanner = await factory.createClassifier({type: ClassifierTypes.kImage});
+	textScanner = await factory.createClassifier({type: ClassifierTypes.kText});
+
+	if (!imageScanner) {
+		console.error('Couldn\'t get image scanner!');
+	}
+
+	if (!textScanner) {
+		console.error('Couldn\'t get text scanner!');
+	}
 
 	const enabled: boolean = (await browser.storage.local.get('enabled'))?.enabled ?? true;
 	await browser.browserAction.setIcon({path: enabled ? '../assets/icon.png' : '../assets/icon_disabled.png'});
 })();
+
+async function createResultPage(result: ClassifierOutput) {
+	if (result) {
+		const url = `/public/results.html?res=${
+			encodeURIComponent(JSON.stringify(result))
+		}`;
+		await browser.tabs.create({url});
+	}
+}
 
 // Scans image
 browser.contextMenus.create(
@@ -52,12 +66,7 @@ browser.contextMenus.onClicked.addListener(async (info, _tab) => {
 		case 'scan-selection':
 			if (info.selectionText) {
 				const result = await textScanner.classify({body: info.selectionText});
-				console.log(`Scan result for "${info.selectionText}": ${result ? 'fake!' : 'legit'}`);
-				if (result) {
-					const conf = (Math.random() * (0.99 - 0.65)) + 0.65;
-					const url = `/public/results.html?conf=${conf}&cat=Fake News&cat=Satire&cat=cringe`;
-					await browser.tabs.create({url});
-				}
+				await createResultPage(result);
 			}
 
 			break;
@@ -66,7 +75,7 @@ browser.contextMenus.onClicked.addListener(async (info, _tab) => {
 	}
 });
 
-browser.runtime.onMessage.addListener(async (request: any, _sender: browser.runtime.MessageSender, sendResponse: any) => {
+browser.runtime.onMessage.addListener(async (request: any, sender: browser.runtime.MessageSender, sendResponse: any) => {
 	switch (request?.message) {
 		case 'getEnabled': {
 			const retrieved = await browser.storage.local.get('enabled');
@@ -93,9 +102,24 @@ browser.runtime.onMessage.addListener(async (request: any, _sender: browser.runt
 		}
 
 		case 'openNewTab': {
-			const conf = (Math.random() * (0.99 - 0.65)) + 0.65;
-			const url = `${request?.url ?? '#'}?conf=${conf}&cat=Fake News&cat=Satire&cat=cringe`;
-			await browser.tabs.create({url});
+			const result = request?.result;
+			if (result) {
+				await createResultPage(result);
+			}
+
+			break;
+		}
+
+		case 'updateBadge': {
+			const count = request?.count;
+			const tabId = sender.tab?.id;
+			if (count && tabId) {
+				await browser.storage.local.set({count});
+				await browser.browserAction.setBadgeText({text: `${count}`, tabId});
+			} else {
+				await browser.storage.local.set({count: 0});
+				await browser.browserAction.setBadgeText({text: '', tabId});
+			}
 
 			break;
 		}

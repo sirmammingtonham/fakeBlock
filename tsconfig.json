@@ -17,14 +17,14 @@
 		"noUnusedLocals": true,
 		"noUnusedParameters": true,
 		"noFallthroughCasesInSwitch": true,
-		"noUncheckedIndexedAccess": true,
 		"noEmitOnError": true,
 		"useDefineForClassFields": true,
 		"forceConsistentCasingInFileNames": true,
 		"skipLibCheck": true,
-		"strictPropertyInitialization": false
+		"strictPropertyInitialization": false,
+		"esModuleInterop": true,
 	},
     "include": [
         "src"
-    ]
+    ],
 }

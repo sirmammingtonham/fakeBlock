@@ -1,11 +1,23 @@
 // original implementation from https://github.com/tedhtchang/bert-tokenizer
 import WordPieceTokenizer from './wordpiece-tokenizer';
 
+/**
+ * Returns if a code point is punctuation
+ *
+ * @param cp the code point
+ * @returns true if code point is punctuation, false otherwise
+ */
 function isPunctuation(cp: number): boolean {
 	// Checks a cp is a punctuation character or not.
 	return (punctuations.has(cp));
 }
 
+/**
+ * Strips string of accents
+ *
+ * @param text the string to strip
+ * @returns stripped string
+ */
 function runStripAccents(text: string) {
 	// strips accent marks from text
 	text = text.normalize('NFD');
@@ -16,6 +28,12 @@ function runStripAccents(text: string) {
 	return text;
 }
 
+/**
+ * Returns if a code point is white space
+ *
+ * @param cp the code point
+ * @returns true if code point is white space, false otherwise
+ */
 function isWhiteSpace(cp: number): boolean {
 	// \t, \n, and \r are technically control characters but we treat them
 	// as whitespace since they are generally considered as such.
@@ -30,6 +48,12 @@ function isWhiteSpace(cp: number): boolean {
 	return false;
 }
 
+/**
+ * Returns if a code point is a control character
+ *
+ * @param cp the code point
+ * @returns true if code point is control char, false otherwise
+ */
 function isControl(cp: number): boolean {
 	// "\t" "\n" "\r" are technically control characters but we count them as whitespace
 	// characters.
@@ -40,12 +64,17 @@ function isControl(cp: number): boolean {
 	return false;
 }
 
+/**
+ * Splits punctuation with a space on a piece of text
+ *
+ * e.g.:
+ * "abc?" -> "abc ?"
+ * "abc?def" -> "abc ? def"
+ * "abc??def" -> abc ? ? def"
+ * @param text the text to split
+ * @returns string of split text
+ */
 function runSplitOnPunctuation(text: string) {
-	// Splits punctuation with a space on a piece of text
-	// e.g.:
-	// "abc?" -> "abc ?"
-	// "abc?def" -> "abc ? def"
-	// "abc??def" -> abc ? ? def"
 	const output = [];
 	let preCodePoint = -1;
 	let preCodePointIsPunc = false;
@@ -70,8 +99,13 @@ function runSplitOnPunctuation(text: string) {
 	return String.fromCodePoint(...output);
 }
 
+/**
+ * Performs invalid character removal and whitespace cleanup on text.
+ *
+ * @param text the text to clean
+ * @returns cleaned text
+ */
 function cleanText(text: string) {
-	// Performs invalid character removal and whitespace cleanup on text.
 	const output = [];
 	for (let i = 0; i < text.length; i++) {
 		const cp = text.charCodeAt(i);
@@ -89,8 +123,13 @@ function cleanText(text: string) {
 	return String.fromCharCode(...output);
 }
 
+/**
+ * BertTokenizer class
+ * Converts strings to tokens to numbers so we can use them in the neural network classifier
+ * Runs basic tokenization (punctuation splitting, lower casing, etc.)
+ * Has-a {WordPieceTokenizer} (uses it under the hood)
+ */
 export class BertTokenizer {
-	// Runs basic tokenization (punctuation splitting, lower casing, etc.).
 	tokenizer: WordPieceTokenizer;
 	clsId: number;
 	sepId: number;
@@ -107,7 +146,13 @@ export class BertTokenizer {
 		this.sepId = this.convertTokensToId('[SEP]')[0]!;
 	}
 
-	tokenize(text: string) {
+	/**
+	 * preprocesses input and returns list of token ids
+	 *
+	 * @param text the example input
+	 * @returns token ids
+	 */
+	public tokenize(text: string) {
 		text = cleanText(text);
 		text = runSplitOnPunctuation(text);
 		text = runStripAccents(text);
@@ -118,7 +163,13 @@ export class BertTokenizer {
 		return this.tokenizer.tokenize(text);
 	}
 
-	convertIdsToTokens(ids: number[]) {
+	/**
+	 * decodes tokenized input from ids to tokens
+	 *
+	 * @param ids the array of token ids
+	 * @returns array of tokens
+	 */
+	public convertIdsToTokens(ids: number[]) {
 		const tokens: string[] = [];
 		for (const id of ids) {
 			tokens.push(this.tokenizer.vocab[id]!);
@@ -127,18 +178,27 @@ export class BertTokenizer {
 		return tokens;
 	}
 
-	convertTokensToId(token: string) {
-		// convert a token directly to token ID without any pre processing
+	/**
+	 * convert a string directly to token ID without any pre processing
+	 *
+	 * @param text the example input
+	 * @returns token ids
+	 */
+	public convertTokensToId(token: string) {
 		return this.tokenizer.tokenize(token);
 	}
 
-	convertSingleExample(text: string) {
-		// converts single example to feature input. This is derived from:
-		// https://github.com/google-research/bert/blob/88a817c37f788702a363ff935fd173b6dc6ac0d6/run_classifier.py#L377-L476
-
-		const inputIds: number[] = [];
-		const inputMask: number[] = [];
-		const segmentIds: number[] = [];
+	/**
+	 * converts single example to feature input. This is derived from:
+	 * https://github.com/google-research/bert/blob/88a817c37f788702a363ff935fd173b6dc6ac0d6/run_classifier.py#L377-L476
+	 *
+	 * @param text the example input
+	 * @returns inputIds, segmentIds, and inputMask
+	 */
+	public convertSingleExample(text: string) {
+		let inputIds: number[] = [];
+		let inputMask: number[] = [];
+		let segmentIds: number[] = [];
 		const tokenIds = this.tokenize(text);
 
 		inputIds.push(this.clsId);
@@ -163,10 +223,12 @@ export class BertTokenizer {
 			segmentIds.push(0);
 		}
 
-		// console.log('input_ids: ', inputIds);
-		// console.log('input_mask: ', inputMask);
-		// console.log('segmentIds: ', segmentIds);
-		// console.log('tokens: ', this.convertIdsToTokens(inputIds));
+		if (inputIds.length > this.maxSeqLength) {
+			inputIds = inputIds.slice(0, this.maxSeqLength + 1);
+			inputMask = inputMask.slice(0, this.maxSeqLength + 1);
+			segmentIds = segmentIds.slice(0, this.maxSeqLength + 1);
+		}
+
 		return {inputIds, segmentIds, inputMask};
 	}
 }

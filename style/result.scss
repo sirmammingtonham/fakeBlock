@@ -1,0 +1,19 @@
+.graph__container {
+	margin: auto;
+	width: 50%;
+	display: flex;
+
+	div {
+		padding-top: 100px;
+	}
+}
+
+.graph__header {
+	display: flex;
+	align-items: center;
+	flex-wrap: wrap;
+}
+
+.color__secondary {
+	color: hsl(340, 100%, 67%);
+}

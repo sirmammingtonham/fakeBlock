@@ -2,18 +2,20 @@ const path = require('path');
 const SizePlugin = require('size-plugin');
 const CopyPlugin = require('copy-webpack-plugin');
 // const TerserPlugin = require('terser-webpack-plugin');
-const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const {CleanWebpackPlugin} = require('clean-webpack-plugin');
 
 module.exports = {
 	mode: process.env.NODE_ENV,
-	devtool: 'source-map',
+	devtool:
+		process.env.NODE_ENV === 'production' ?
+			undefined :
+			'inline-cheap-module-source-map',
 	stats: 'errors-only',
 	entry: {
 		background: './src/background.ts',
 		blocker: './src/blocker.ts',
-		popup: './src/popup.tsx',
-		results: './src/results.tsx'
+		popup: './src/components/popup.tsx',
+		results: './src/components/result.tsx'
 	},
 	output: {
 		path: path.join(__dirname, 'dist'),
@@ -23,7 +25,24 @@ module.exports = {
 		rules: [
 			{
 				test: /\.(scss|css)$/,
-				use: [MiniCssExtractPlugin.loader, 'css-loader', 'sass-loader']
+				use: [
+					'style-loader',
+					{
+						loader: 'css-loader',
+						options: {
+							modules: {
+								localIdentName: '[local]'
+							}
+						}
+					},
+					{
+						loader: 'sass-loader',
+						options: {
+							// Prefer `dart-sass`
+							implementation: require('sass')
+						}
+					}
+				]
 			},
 			{
 				test: /\.(js|ts|tsx)$/,
@@ -50,15 +69,11 @@ module.exports = {
 				from: './public/*'
 			},
 			{
-				from: './ml/distilbert_ISOT',
+				from: './ml/distilbert_nela_js',
 				to: 'distilbert'
 			}
 		]),
-		new CleanWebpackPlugin(),
-		new MiniCssExtractPlugin({
-			filename: '[name].css',
-			chunkFilename: '[id].css'
-		})
+		new CleanWebpackPlugin()
 	],
 	// optimization: {
 	// 	minimizer: [

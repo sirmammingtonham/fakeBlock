@@ -4,3 +4,4 @@ model/
 runs/
 distilbert*/
 __pycache__
+*.rar

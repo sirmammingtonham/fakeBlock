@@ -1,25 +1,22 @@
 import React from 'react';
-import PropTypes from 'prop-types';
+// import PropTypes from 'prop-types';
 import {makeStyles, LinearProgress, Typography, Box} from '@material-ui/core';
 
 function LinearProgressWithLabel(props: any) {
+	console.log(`percentage:${props.value}`);
 	return (
 		<Box display="flex" alignItems="center">
 			<Box width="100%" mr={1}>
 				<LinearProgress variant="determinate" {...props} />
 			</Box>
 			<Box minWidth={270}>
-				<Typography variant="body2" color="textSecondary">{`Fake Info Percentage: ${Math.round(
+				<Typography variant="body2" color="textSecondary">{`Detected ${Math.round(
 					props.value
-				)}%`}</Typography>
+				)} untrustworthy paragraphs.`}</Typography>
 			</Box>
 		</Box>
 	);
 }
-
-LinearProgressWithLabel.propTypes = {
-	value: PropTypes.number.isRequired
-};
 
 const useStyles = makeStyles({
 	root: {
@@ -29,8 +26,7 @@ const useStyles = makeStyles({
 
 export default function LinearWithValueLabel(props: any) {
 	const classes = useStyles();
-	const [progress] = React.useState(props.percentage);
-
+	const progress = props.percentage;
 	return (
 		<div className={classes.root}>
 			<LinearProgressWithLabel value={progress} />

@@ -37,7 +37,7 @@ from transformers import (
 )
 from transformers.utils import logging as hf_logging
 
-from modeling.multi_output_distilbert import TFDistilBertForFakeNewsClassification
+from modeling.multi_output_distilbert import TFDistilBertForFakeNewsClassification # type: ignore
 
 
 hf_logging.set_verbosity_info()

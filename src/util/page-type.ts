@@ -1,3 +1,5 @@
+import * as newsList from '../../assets/news-list.json';
+
 export const enum Websites {
 	kOther,
 	kTwitter,
@@ -5,6 +7,7 @@ export const enum Websites {
 	kNewsSite
 }
 
+/// utility function to allow us to tailor interface on specific sites
 export function pageType(url: string): Websites {
 	if (url.includes('twitter.com')) {
 		return Websites.kTwitter;
@@ -13,13 +16,12 @@ export function pageType(url: string): Websites {
 	if (url.includes('facebook.com')) {
 		return Websites.kFacebook;
 	}
-	const newslist = require('../../assets/news-list.json');
-	for(var i = 0; i < newslist.newssites.length; i++)
-	{
-		if(url.includes(newslist[i]))
-		{
+
+	for (const newsSite of newsList.sites) {
+		if (url.includes(newsSite)) {
 			return Websites.kNewsSite;
 		}
 	}
+
 	return Websites.kOther;
 }
