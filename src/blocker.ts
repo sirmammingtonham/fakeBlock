@@ -30,7 +30,7 @@ function createCollapsible(p: Element, index: number, result: ClassifierOutput) 
 
 	const toggleButton = document.createElement('button');
 	toggleButton.innerHTML = 'Detected fake news! Click to show.';
-	toggleButton.classList.add('btn', 'btn-primary', 'btn__first');
+	toggleButton.classList.add('collapse__button');
 	toggleButton.dataset.toggle = 'collapse';
 	toggleButton.dataset.target = `.collapse._${index}`;
 	toggleButton.dataset.text = 'Collapse';

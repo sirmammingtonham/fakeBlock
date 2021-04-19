@@ -4,6 +4,14 @@
 	box-sizing: border-box;
 }
 
+.collapse__button {
+	background-color: hsl(3, 100%, 69%);
+	color: hsl(0, 0%, 100%);
+	box-sizing: border-box;
+	border-radius: 2px;
+	font-size: 1em;
+}
+
 .collapse {
 	display: block;
 	max-height: 0;
@@ -23,15 +31,16 @@
 	// height: 250px;
 
 	&__content {
-		border: 1px solid #ccc;
+		border: 1px solid hsl(0, 0%, 80%);
 		padding: 1.5em;
-		height: 100%;
+		height: auto;
 		color: hsl(0, 0%, 0%);
 	}
 }
 
 /* linkwarning container */
-.link-sus { // haha funny amogus
+.link-sus {
+	// haha funny amogus
 	position: relative;
 	display: inline-block;
 	border-bottom: 1px dotted hsl(0, 0%, 0%);
@@ -51,7 +60,6 @@
 		margin-left: -60px;
 
 		&::after {
-			content: '';
 			position: absolute;
 			bottom: 100%;
 			left: 50%;
