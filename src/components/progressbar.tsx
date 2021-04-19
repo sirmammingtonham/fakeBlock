@@ -10,9 +10,9 @@ function LinearProgressWithLabel(props: any) {
 				<LinearProgress variant="determinate" {...props} />
 			</Box>
 			<Box minWidth={270}>
-				<Typography variant="body2" color="textSecondary">{`Number of fake info detected: ${Math.round(
+				<Typography variant="body2" color="textSecondary">{`Detected ${Math.round(
 					props.value
-				)}`}</Typography>
+				)} untrustworthy paragraphs.`}</Typography>
 			</Box>
 		</Box>
 	);

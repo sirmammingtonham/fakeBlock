@@ -110,6 +110,18 @@ browser.runtime.onMessage.addListener(async (request: any, _sender: browser.runt
 			break;
 		}
 
+		case 'updateBadge': {
+			const count = request?.count;
+			if (count) {
+				await browser.storage.local.set({count});
+				await browser.browserAction.setBadgeText({text: `${count}`});
+			} else {
+				await browser.storage.local.set({count: 0});
+			}
+
+			break;
+		}
+
 		default:
 			break;
 	}

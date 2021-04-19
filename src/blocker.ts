@@ -16,9 +16,11 @@ import {ClassifierOutput, AggregateLabels} from './detection/classifier';
 				setTimeout(async () => {
 					const count = await runBlocker();
 					console.log(`count is ${count}`);
-					await browser.storage.local.set({ct: count});
+					await browser.runtime.sendMessage({message: 'updateBadge', count});
 				}, 1000); // wait 1 sec for page to load
 		}
+	} else {
+		await browser.runtime.sendMessage({message: 'updateBadge', count: null});
 	}
 })();
 
