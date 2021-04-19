@@ -60,6 +60,7 @@ function createCollapsible(p: Element, index: number, result: ClassifierOutput) 
 	p.replaceWith(containerDiv);
 }
 
+// This is the meat of the blocking script
 // waits until the page is done loading and then collects all of the wanted elements
 // on the page that containt text and sends it through to the machine learning model
 // If the result of the ml model flags the text, then the element is wrapped in a collapsible and is 'blocked'
@@ -69,7 +70,10 @@ export async function runBlocker() {
 	// Add support later for other tags
 	let count = 0;
 
-	const elementArray = document.querySelectorAll('p,h1,h2,h3,h4,h5,h6,dd,li,text');
+	// collects all of the non-header and non-span tags, and runs each piece through the ml model
+	// if the text is flagged, it is wrapped in the collapsible
+	// to be put in the model, the model must have at least 15 words (as to not clog up the model)
+	const elementArray = document.querySelectorAll('p,dd,li,text');
 	await Promise.all([...elementArray].map(async (p, index) => {
 		if (!p.textContent || p.textContent.split(' ').length < 15) {
 			return; // skip scanning content that doesn't look to be a complete sentence (< 15 words)
@@ -84,10 +88,30 @@ export async function runBlocker() {
 		});
 	}));
 
+	console.log('Header time:');
+	console.time('Headers');
+	// collects all of the header tags, and runs each piece through the ml model
+	// if the text is flagged, it is wrapped in the collapsible
+	// headers usually are not complete sentences, so we lower the length requirement to 5 words
+	const headerArray = document.querySelectorAll('h1,h2,h3,h4,h5,h6');
+	await Promise.all([...headerArray].map(async (p, index) => {
+		if (!p.textContent || p.textContent.split(' ').length < 5) {
+			return;
+		}
+
+		const result = await browser.runtime.sendMessage({message: 'scanText', text: p.textContent});
+		// should maybe have it so if aggregate is mixed, text is highlighted but not blocked
+		if (result && result.valueAggregate !== AggregateLabels.reliable) {
+			count += 1;
+			createCollapsible(p, index, result);
+		}
+	}));
+	console.timeEnd('Headers');
+
 	const divArray = document.querySelectorAll('span'); // div
 	// go through divs, try getting only divs with text in them
-	// general solution, block all divs that have no children, but this needs to be worked out
-	// text can have <b>(bold), <i>(italic) elements and things like that which prevent the blocking
+	// if the text is flagged, it is wrapped in the collapsible
+	// to be put in the model, the model must have at least 15 words (as to not clog up the model)
 	await Promise.all([...divArray].map(async (p, index) => {
 		if (!p.textContent || p.textContent.split(' ').length < 15) { // || p.hasChildNodes
 			return; // skip scanning content that doesn't look to be a complete sentence (< 15 words)
@@ -103,6 +127,7 @@ export async function runBlocker() {
 
 	const triggers = new Set([...document.querySelectorAll('[data-toggle="collapse"]')]);
 
+	// for every collapsible we put on the page, we add the toggle functionality to open and close the button
 	window.addEventListener('click', ev => {
 		const elm = ev.target as Element;
 		if (triggers.has(elm)) {
