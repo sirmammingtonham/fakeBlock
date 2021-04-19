@@ -14,7 +14,7 @@ export default class Popup extends React.Component<PopupProps, PopupState> {
 		this.state = {
 			powerOn: true,
 			whitelist: [],
-			collapsibleCount: 0
+			collapsibleCount: 1
 		};
 		this.buttonClick = this.buttonClick.bind(this);
 		this.logStorageChange = this.logStorageChange.bind(this);
@@ -58,9 +58,10 @@ export default class Popup extends React.Component<PopupProps, PopupState> {
 		// }
 		// const data: any = await browser.storage.local.get('ct');
 		// console.log(data.ct);
-		await browser.storage.local.set({ct: -1});
+		const countData = (await browser.storage.local.get('ct'))?.ct ?? 0;
+		await browser.storage.local.set({ct: countData});
 		browser.storage.onChanged.addListener(this.logStorageChange);
-		this.setState({...this.state, powerOn: enabled, whitelist: disabledList});
+		this.setState({...this.state, powerOn: enabled, whitelist: disabledList, collapsibleCount: countData});
 	}
 
 	render() {
