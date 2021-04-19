@@ -29,6 +29,12 @@ export default class Popup extends React.Component<PopupProps, PopupState> {
 		await browser.tabs.reload();
 		await browser.browserAction.setIcon({path: enabled ? '../assets/icon.png' : '../assets/icon_disabled.png'});
 		const data = await browser.storage.local.get('ct');
+		if (!enabled) {
+			await browser.storage.local.set({
+				ct: 0
+			});
+		}
+
 		console.log(data.ct);
 		this.setState({...this.state, powerOn: enabled});
 	}
@@ -61,6 +67,12 @@ export default class Popup extends React.Component<PopupProps, PopupState> {
 		const countData = (await browser.storage.local.get('ct'))?.ct ?? 0;
 		await browser.storage.local.set({ct: countData});
 		browser.storage.onChanged.addListener(this.logStorageChange);
+		if (!enabled) {
+			await browser.storage.local.set({
+				ct: 0
+			});
+		}
+
 		this.setState({...this.state, powerOn: enabled, whitelist: disabledList, collapsibleCount: countData});
 	}
 
