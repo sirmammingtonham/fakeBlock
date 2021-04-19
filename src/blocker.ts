@@ -1,5 +1,6 @@
 import '../style/blocker.scss';
 import {browser} from 'webextension-polyfill-ts';
+import {checkDisablelist} from './util/link-util';
 import {Websites, pageType} from './util/page-type';
 import {ClassifierOutput, AggregateLabels} from './detection/classifier';
 
@@ -7,20 +8,20 @@ import {ClassifierOutput, AggregateLabels} from './detection/classifier';
 (async () => {
 	const enabled: boolean = (await browser.storage.local.get('enabled'))?.enabled ?? true;
 	const disabledList: string[] = (await browser.storage.local.get('whitelist'))?.whitelist ?? [];
-	if (enabled && !disabledList.includes(window.location.href)) {
+	if (enabled && checkDisablelist(window.location.href, disabledList)) {
 		switch (pageType(window.location.origin)) {
 			case Websites.kFacebook:
 			case Websites.kTwitter:
 			case Websites.kNewsSite:
 			default:
 				setTimeout(async () => {
+					await browser.runtime.sendMessage({message: 'updateBadge', count: undefined});
 					const count = await runBlocker();
-					console.log(`count is ${count}`);
 					await browser.runtime.sendMessage({message: 'updateBadge', count});
 				}, 1000); // wait 1 sec for page to load
 		}
 	} else {
-		await browser.runtime.sendMessage({message: 'updateBadge', count: null});
+		await browser.runtime.sendMessage({message: 'updateBadge', count: undefined});
 	}
 })();
 

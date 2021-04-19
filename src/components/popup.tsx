@@ -48,24 +48,8 @@ export default class Popup extends React.Component<PopupProps, PopupState> {
 	async componentDidMount() {
 		const enabled: boolean = (await browser.storage.local.get('enabled'))?.enabled ?? true;
 		const disabledList: string[] = (await browser.storage.local.get('whitelist'))?.whitelist ?? [];
-		// const tabs: any = await browser.tabs.query({active: true, currentWindow: true});
-		// const response: any = await browser.tabs.sendMessage(tabs[0].id, {type: 'getCount'});
-		// if (typeof response === 'undefined') {
-		// 	console.log('undefined count');
-		// } else {
-		// 	console.log(response);
-		// 	this.setState({...this.state, collapsibleCount: response});
-		// }
-		// const data: any = await browser.storage.local.get('ct');
-		// console.log(data.ct);
 		const count = (await browser.storage.local.get('count'))?.count ?? 0;
-		// await browser.storage.local.set({count});
 		browser.storage.onChanged.addListener(this.logStorageChange);
-		// if (!enabled) {
-		// 	await browser.storage.local.set({
-		// 		ct: 0
-		// 	});
-		// }
 
 		this.setState({...this.state, powerOn: enabled, whitelist: disabledList, collapsibleCount: count});
 	}

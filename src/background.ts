@@ -75,7 +75,7 @@ browser.contextMenus.onClicked.addListener(async (info, _tab) => {
 	}
 });
 
-browser.runtime.onMessage.addListener(async (request: any, _sender: browser.runtime.MessageSender, sendResponse: any) => {
+browser.runtime.onMessage.addListener(async (request: any, sender: browser.runtime.MessageSender, sendResponse: any) => {
 	switch (request?.message) {
 		case 'getEnabled': {
 			const retrieved = await browser.storage.local.get('enabled');
@@ -112,11 +112,13 @@ browser.runtime.onMessage.addListener(async (request: any, _sender: browser.runt
 
 		case 'updateBadge': {
 			const count = request?.count;
-			if (count) {
+			const tabId = sender.tab?.id;
+			if (count && tabId) {
 				await browser.storage.local.set({count});
-				await browser.browserAction.setBadgeText({text: `${count}`});
+				await browser.browserAction.setBadgeText({text: `${count}`, tabId});
 			} else {
 				await browser.storage.local.set({count: 0});
+				await browser.browserAction.setBadgeText({text: '', tabId});
 			}
 
 			break;
