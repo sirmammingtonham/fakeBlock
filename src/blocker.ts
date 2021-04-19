@@ -60,7 +60,7 @@ function createCollapsible(p: Element, index: number, result: ClassifierOutput) 
 // waits until the page is done loading and then collects all of the wanted elements
 // on the page that containt text and sends it through to the machine learning model
 // If the result of the ml model flags the text, then the element is wrapped in a collapsible and is 'blocked'
-async function runBlocker() {
+export async function runBlocker() {
 	// checkLinks();
 	// Replace paragraphs with collapsible divs
 	// Add support later for other tags
