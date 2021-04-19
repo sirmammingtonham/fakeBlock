@@ -1,5 +1,5 @@
 import React from 'react';
-import PropTypes from 'prop-types';
+// import PropTypes from 'prop-types';
 import {makeStyles, LinearProgress, Typography, Box} from '@material-ui/core';
 
 function LinearProgressWithLabel(props: any) {
@@ -18,10 +18,6 @@ function LinearProgressWithLabel(props: any) {
 	);
 }
 
-LinearProgressWithLabel.propTypes = {
-	value: PropTypes.number.isRequired
-};
-
 const useStyles = makeStyles({
 	root: {
 		width: '80%'
@@ -31,7 +27,6 @@ const useStyles = makeStyles({
 export default function LinearWithValueLabel(props: any) {
 	const classes = useStyles();
 	const progress = props.percentage;
-
 	return (
 		<div className={classes.root}>
 			<LinearProgressWithLabel value={progress} />

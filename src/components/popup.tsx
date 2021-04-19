@@ -14,7 +14,7 @@ export default class Popup extends React.Component<PopupProps, PopupState> {
 		this.state = {
 			powerOn: true,
 			whitelist: [],
-			collapsibleCount: 1
+			collapsibleCount: 0
 		};
 		this.buttonClick = this.buttonClick.bind(this);
 		this.logStorageChange = this.logStorageChange.bind(this);
