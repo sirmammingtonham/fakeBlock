@@ -71,21 +71,21 @@ export default class Result extends React.Component {
 					backgroundColor: [
 						'rgba(255, 99, 132, 1)',
 						'rgba(255, 159, 64, 1)',
-						'rgba(255, 205, 86, 1)',
+						'rgba(183, 220, 214, 1)',
 						'rgba(75, 192, 192, 1)',
 						'rgba(54, 162, 235, 1)',
 						'rgba(153, 102, 255, 1)',
-						'rgba(88, 199, 200, 1)',
+						'rgba(174, 170, 214, 1)',
 						'rgba(201, 203, 207, 1)'
 					],
 					borderColor: [
 						'rgb(255, 99, 132)',
 						'rgb(255, 159, 64)',
-						'rgb(255, 205, 86)',
+						'rgb(183, 220, 214)',
 						'rgb(75, 192, 192)',
 						'rgb(54, 162, 235)',
 						'rgb(153, 102, 255)',
-						'rgb(88, 199, 200)',
+						'rgb(174, 170, 214)',
 						'rgb(201, 203, 207)'
 					],
 					borderWidth: 1
@@ -126,11 +126,11 @@ export default class Result extends React.Component {
 					borderColor: [
 						'rgb(255, 99, 132)',
 						'rgb(255, 159, 64)',
-						'rgb(255, 205, 86)',
+						'rgb(183, 220, 214)',
 						'rgb(75, 192, 192)',
 						'rgb(54, 162, 235)',
 						'rgb(153, 102, 255)',
-						'rgb(88, 199, 200)',
+						'rgb(174, 170, 214)',
 						'rgb(201, 203, 207)'
 					],
 					borderWidth: 1
@@ -142,21 +142,21 @@ export default class Result extends React.Component {
 					backgroundColor: [
 						'rgba(255, 99, 132, 1)',
 						'rgba(255, 159, 64, 1)',
-						'rgba(255, 205, 86, 1)',
+						'rgba(183, 220, 214, 1)',
 						'rgba(75, 192, 192, 1)',
 						'rgba(54, 162, 235, 1)',
 						'rgba(153, 102, 255, 1)',
-						'rgba(88, 199, 200, 1)',
+						'rgba(174, 170, 214, 1)',
 						'rgba(201, 203, 207, 1)'
 					],
 					borderColor: [
 						'rgb(255, 99, 132)',
 						'rgb(255, 159, 64)',
-						'rgb(255, 205, 86)',
+						'rgb(183, 220, 214)',
 						'rgb(75, 192, 192)',
 						'rgb(54, 162, 235)',
 						'rgb(153, 102, 255)',
-						'rgb(88, 199, 200)',
+						'rgb(174, 170, 214)',
 						'rgb(201, 203, 207)'
 					],
 					borderWidth: 1
