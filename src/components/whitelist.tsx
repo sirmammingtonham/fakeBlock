@@ -6,6 +6,7 @@ import WebIcon from '@material-ui/icons/Web.js';
 import DeleteIcon from '@material-ui/icons/Delete.js';
 import AddIcon from '@material-ui/icons/Add.js';
 
+// Styles for whitelist
 const useStyles = makeStyles((theme: any) => ({
 	root: {
 		flexGrow: 1,
@@ -18,7 +19,7 @@ const useStyles = makeStyles((theme: any) => ({
 		margin: theme.spacing(4, 0, 2)
 	}
 }));
-
+// pass in parameter from popup through props
 type WebsiteProps = {webs: string[]};
 
 export default function WhiteList(props: WebsiteProps) {
@@ -26,6 +27,7 @@ export default function WhiteList(props: WebsiteProps) {
 	const [websites, setWebs] = React.useState(props.webs);
 	const [value, setValue] = React.useState('');
 
+	// called when the component is mounted
 	React.useEffect(() => {
 		async function setDisablelist() {
 			const disableList = (await browser.storage.local.get('whitelist'))?.whitelist ?? [];
@@ -35,6 +37,7 @@ export default function WhiteList(props: WebsiteProps) {
 		void setDisablelist();
 	}, []);
 
+	// function that supports the list
 	const listWeb = () => {
 		const deleteWeb = async (name: string) => {
 			let webs: string[] = websites;
@@ -58,6 +61,7 @@ export default function WhiteList(props: WebsiteProps) {
 			await browser.tabs.reload();
 		};
 
+		// the list part of the component
 		const listItems = websites.map((web: string, index: number) =>
 			<ListItem key={`whitelist_${index}`}>
 				<ListItemAvatar>
@@ -78,6 +82,8 @@ export default function WhiteList(props: WebsiteProps) {
 				</ListItemSecondaryAction>
 			</ListItem>
 		);
+
+		// the add button of the component
 		const addButton = <IconButton edge="end" aria-label="delete" onClick={ async () => {
 			await addWeb(value);
 		}}><AddIcon/></IconButton>;
@@ -86,6 +92,7 @@ export default function WhiteList(props: WebsiteProps) {
 			setValue(event.target.value);
 		};
 
+		// a text field where user can enter the website name
 		const addForm = <TextField
 			key="whitelist_input"
 			id="standard-multiline-flexible"
