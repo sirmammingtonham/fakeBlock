@@ -22,11 +22,11 @@ export class TextClassifier extends Classifier {
 	}
 
 	/**
-	 * Static getter for model path
+	 * Static getter for model path (public for jest mocks)
 	 *
 	 * @returns Path to model
 	 */
-	private static get modelPath() {
+	public static get modelPath(): string | tf.io.IOHandler {
 		return './distilbert/model.json';
 	}
 
@@ -87,7 +87,7 @@ export class TextClassifier extends Classifier {
 
 		tf.engine().endScope();
 
-		console.log(output);
+		console.log(selection.body, output);
 
 		return output;
 	}

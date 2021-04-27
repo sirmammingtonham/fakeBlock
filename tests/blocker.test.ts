@@ -1,38 +1,58 @@
+import path from 'path';
 import * as fs from 'fs';
+import * as tfn from '@tensorflow/tfjs-node';
+
 import {JSDOM} from 'jsdom';
-import {chrome} from 'jest-chrome';
-import * as blocker from '../src/blocker';
+import {browser, mockBrowser, mockBrowserNode} from './browser-mocks';
+import {TextClassifier} from '../src/detection/text-classifier';
 
-const html = fs.readFileSync('test_assets/mock.html');
-const page = new JSDOM(html);
+import * as blocker from '../src/blocker'; // must go last
 
-// jest.mock('browser', () => chrome);
+jest.mock('webextension-polyfill-ts', () => {
+	mockBrowser.storage.local.get.mock(
+		async _keys => {
+			return {enabled: false, whitelist: []}; // disable so it doesn't run before our tests
+		}
+	);
+	return {browser};
+});
 
-describe('blocker dom injection', () => {
-	test('browser api injection', () => {
-		const browser = chrome;
-		const message = {greeting: 'hello?'};
-		const response = {greeting: 'here I am'};
-		const callbackSpy = jest.fn();
+// const html = fs.readFileSync(path.resolve(__dirname, './test_assets/mock.html'));
+// const page = new JSDOM(html);
+// document = page.window.document;
+// window = page.window;
 
-		browser.runtime.sendMessage.mockImplementation(
-			(_message, callback) => {
-				callback(response);
-			}
-		);
+const handler = tfn.io.fileSystem(path.resolve(__dirname, '../ml/distilbert_nela_js/model.json'));
+jest.spyOn(TextClassifier, 'modelPath', 'get').mockReturnValue(handler);
 
-		browser.runtime.sendMessage(message, callbackSpy);
+describe('blocker tests', () => {
+	beforeEach(() => {
+		const html = fs.readFileSync(path.resolve(__dirname, './test_assets/mock.html'));
+		const page = new JSDOM(html);
+		global.document = page.window.document;
+		global.window = page.window as unknown as Window & typeof globalThis;
+		mockBrowserNode.enable();
+	});
 
-		expect(browser.runtime.sendMessage).toBeCalledWith(
-			message,
-			callbackSpy
-		);
-		expect(callbackSpy).toBeCalledWith(response);
+	afterEach(() => {
+		mockBrowserNode.verifyAndDisable();
 	});
 
 	test('blocker script on website', async () => {
-		const {window} = page;
-		await blocker.runBlocker();
+		const textScanner = await TextClassifier.create();
+		mockBrowser.runtime.sendMessage.mock(
+			async (request: any) => {
+				const text = request?.text;
+				if (text) {
+					return textScanner.classify({body: text});
+				}
+
+				return undefined;
+			}
+		);
+
+		const count = await blocker.runBlocker();
+		expect(count).toBe(2);
+		// console.log(document.body.innerHTML);
 	});
 });
-

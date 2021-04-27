@@ -15,13 +15,13 @@ import {ClassifierOutput, AggregateLabels} from './detection/classifier';
 			case Websites.kNewsSite:
 			default:
 				setTimeout(async () => {
-					await browser.runtime.sendMessage({message: 'updateBadge', count: undefined});
+					await browser.runtime.sendMessage({message: 'updateBadge'});
 					const count = await runBlocker();
 					await browser.runtime.sendMessage({message: 'updateBadge', count});
 				}, 1000); // wait 1 sec for page to load
 		}
 	} else {
-		await browser.runtime.sendMessage({message: 'updateBadge', count: undefined});
+		await browser.runtime.sendMessage({message: 'updateBadge'});
 	}
 })();
 
