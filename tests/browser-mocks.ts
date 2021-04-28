@@ -1,4 +1,4 @@
-import type {Browser} from 'webextension-polyfill-ts';
-import {deepMock} from 'mockzilla';
-
-export const [browser, mockBrowser, mockBrowserNode] = deepMock<Browser>('browser', false);
+// only need this file because it gets run before the jest.mocks are hoisted,
+// so the variables are actually initialized
+export const storageGet = jest.fn();
+export const sendMessage = jest.fn();

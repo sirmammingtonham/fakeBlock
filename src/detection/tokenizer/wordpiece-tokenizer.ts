@@ -1,4 +1,4 @@
-import * as vocab from './vocab.json';
+import vocab from './vocab.json';
 type Child = Record<string, TrieNode>;
 
 /**

@@ -1,58 +1,66 @@
+/**
+ * Unit tests for our content script (blocker.ts)
+ * Mocks the webext-polyfill browser variable
+ * Uses jsdom to create a dom-like environment from our mock website html
+ * And replaces vanilla tensorflowjs with tensorflowjs-node so our models don't try to use the nonexistent webgl backend
+ */
 import path from 'path';
 import * as fs from 'fs';
 import * as tfn from '@tensorflow/tfjs-node';
 
 import {JSDOM} from 'jsdom';
-import {browser, mockBrowser, mockBrowserNode} from './browser-mocks';
+import {sendMessage, storageGet as get} from './browser-mocks';
 import {TextClassifier} from '../src/detection/text-classifier';
 
-import * as blocker from '../src/blocker'; // must go last
+import * as blocker from '../src/blocker'; // must go last for some reason
+
+jest.mock('@tensorflow/tfjs', () => ({...tfn})); // mock tfjs web with the node version
 
 jest.mock('webextension-polyfill-ts', () => {
-	mockBrowser.storage.local.get.mock(
-		async _keys => {
-			return {enabled: false, whitelist: []}; // disable so it doesn't run before our tests
-		}
-	);
-	return {browser};
+	get.mockReturnValue({enabled: false, whitelist: []}); // mock return value as disabled so we don't automatically run the script
+	sendMessage.mockReturnValueOnce(undefined); // function runs once with message: 'updateBadge', don't want it to do anything
+	return {
+		browser: {
+			storage: {
+				local: {
+					get
+				}
+			},
+			runtime: {
+				sendMessage
+			}
+		}};
 });
 
-// const html = fs.readFileSync(path.resolve(__dirname, './test_assets/mock.html'));
-// const page = new JSDOM(html);
-// document = page.window.document;
-// window = page.window;
+const handler = tfn.io.fileSystem(
+	path.resolve(__dirname, '../ml/distilbert_nela_js/model.json')
+);
+jest.spyOn(TextClassifier, 'modelPath', 'get').mockReturnValue(handler); // replace model path getter with tf-node friendly handler
 
-const handler = tfn.io.fileSystem(path.resolve(__dirname, '../ml/distilbert_nela_js/model.json'));
-jest.spyOn(TextClassifier, 'modelPath', 'get').mockReturnValue(handler);
-
-describe('blocker tests', () => {
+describe('content script tests', () => {
 	beforeEach(() => {
-		const html = fs.readFileSync(path.resolve(__dirname, './test_assets/mock.html'));
+		const html = fs.readFileSync(
+			path.resolve(__dirname, './test_assets/mock.html')
+		);
 		const page = new JSDOM(html);
 		global.document = page.window.document;
-		global.window = page.window as unknown as Window & typeof globalThis;
-		mockBrowserNode.enable();
-	});
-
-	afterEach(() => {
-		mockBrowserNode.verifyAndDisable();
+		global.window = (page.window as unknown) as Window & typeof globalThis;
 	});
 
 	test('blocker script on website', async () => {
 		const textScanner = await TextClassifier.create();
-		mockBrowser.runtime.sendMessage.mock(
-			async (request: any) => {
-				const text = request?.text;
-				if (text) {
-					return textScanner.classify({body: text});
-				}
-
-				return undefined;
+		sendMessage.mockImplementation(async (request: any) => {
+			const text = request?.text;
+			if (text) {
+				return textScanner.classify({body: text});
 			}
-		);
+
+			return undefined;
+		});
 
 		const count = await blocker.runBlocker();
-		expect(count).toBe(2);
-		// console.log(document.body.innerHTML);
+
+		expect(count).toBe(6); // 6 things should be blocked on the page
+		console.log(document.body.innerHTML); // add more tests later
 	});
 });

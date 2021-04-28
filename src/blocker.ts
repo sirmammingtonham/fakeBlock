@@ -88,7 +88,6 @@ export async function runBlocker() {
 		});
 	}));
 
-	console.log('Header time:');
 	console.time('Headers');
 	// collects all of the header tags, and runs each piece through the ml model
 	// if the text is flagged, it is wrapped in the collapsible
