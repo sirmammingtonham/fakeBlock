@@ -1,3 +1,4 @@
+import {browser, Runtime} from 'webextension-polyfill-ts';
 import {Classifier, ClassifierOutput} from './detection/classifier';
 import {ClassifierFactory, ClassifierTypes} from './factory/classifier-factory';
 
@@ -75,14 +76,12 @@ browser.contextMenus.onClicked.addListener(async (info, _tab) => {
 	}
 });
 
-browser.runtime.onMessage.addListener(async (request: any, sender: browser.runtime.MessageSender, sendResponse: any) => {
+browser.runtime.onMessage.addListener(async (request: any, sender: Runtime.MessageSender) => {
 	switch (request?.message) {
 		case 'getEnabled': {
 			const retrieved = await browser.storage.local.get('enabled');
 			const enabled = !retrieved.enabled ?? true;
-			sendResponse({response: enabled});
-
-			return true;
+			return {response: enabled};
 		}
 
 		case 'reload': {
@@ -95,7 +94,6 @@ browser.runtime.onMessage.addListener(async (request: any, sender: browser.runti
 			const text = request?.text;
 			if (text) {
 				return textScanner.classify({body: text});
-				// sendResponse({result});
 			}
 
 			break;
@@ -115,7 +113,7 @@ browser.runtime.onMessage.addListener(async (request: any, sender: browser.runti
 			const tabId = sender.tab?.id;
 			if (count && tabId) {
 				await browser.storage.local.set({count});
-				await browser.browserAction.setBadgeText({text: `${count}`, tabId});
+				await browser.browserAction.setBadgeText({text: `${count as number}`, tabId});
 			} else {
 				await browser.storage.local.set({count: 0});
 				await browser.browserAction.setBadgeText({text: '', tabId});
