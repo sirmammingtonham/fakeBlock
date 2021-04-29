@@ -1,7 +1,13 @@
 # fakeBlock
-## Misinformation Blocking Browser Extension
+## The Misinformation Blocking Browser Extension
 
 RPI Software Design & Documentation S21
+
+fakeBlock is a cross-platform browser extension that functions like an ad-block, but for fake news. 
+
+We use a neural network trained on 1.8M news articles to detect whether or not a paragraph contains misinformation, then hide the offending paragraph.
+You can click on a button to reveal the blocked information and open a results page with data about why our model blocked it, such as probability scores and category tags.
+
 
 ## Building fakeBlock from source
 Extract the distilBERT model into the `ml/` folder.
@@ -22,7 +28,7 @@ To install on chrome:
  4. Select the `dist/` folder.
 
 To install on firefox:
- 1. Open the about:debugging page
+ 1. Open the `about:debugging` page
  2. Click "This Firefox" (in newer versions of Firefox)
  3. Click "Load Temporary Add-on"
  4. Select any file in the `dist/` folder

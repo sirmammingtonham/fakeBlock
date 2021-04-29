@@ -3,7 +3,6 @@
 	"scripts": {
 		"clean": "rm -rf dist",
 		"build": "webpack --mode=development",
-		"lbuild": "run-s lint:* build",
 		"scripts": "tsc scripts/run-scripts.ts --outDir dist/scripts && node dist/scripts/run-scripts.js",
 		"lint": "run-p lint:*",
 		"lint-fix": "run-p 'lint:* -- --fix'",
@@ -40,7 +39,18 @@
 		}
 	},
 	"stylelint": {
-		"extends": "stylelint-config-xo"
+		"extends": "stylelint-config-xo",
+		"rules": {
+			"at-rule-no-unknown": [
+				true,
+				{
+					"ignoreAtRules": [
+						"use"
+					]
+				}
+			],
+			"color-function-notation": null
+		}
 	},
 	"dependencies": {
 		"@material-ui/core": "^4.11.3",
@@ -57,6 +67,11 @@
 		"webextension-polyfill-ts": "^0.24.0"
 	},
 	"devDependencies": {
+		"@material-icons/font": "^1.0.8",
+		"@material/button": "^11.0.0",
+		"@material/card": "^11.0.0",
+		"@material/icon-button": "^11.0.0",
+		"@material/ripple": "^11.0.0",
 		"@tensorflow/tfjs-node": "^3.5.0",
 		"@types/enzyme": "^3.10.8",
 		"@types/enzyme-adapter-react-16": "^1.0.6",
@@ -73,10 +88,14 @@
 		"enzyme": "^3.11.0",
 		"enzyme-adapter-react-16": "^1.15.6",
 		"eslint": "^7.14.0",
+		"file-loader": "^6.2.0",
 		"html-webpack-plugin": "^5.2.0",
+		"i": "^0.3.6",
 		"identity-obj-proxy": "^3.0.0",
 		"jest": "^26.6.3",
 		"jsdom": "^16.5.3",
+		"material-icons": "^0.6.1",
+		"npm": "^7.11.1",
 		"npm-run-all": "^4.1.5",
 		"react-test-renderer": "^17.0.2",
 		"react-tooltip": "^4.2.17",
@@ -84,8 +103,8 @@
 		"sass-loader": "^11.0.1",
 		"size-plugin": "^1.2.0",
 		"style-loader": "^2.0.0",
-		"stylelint": "^13.11.0",
-		"stylelint-config-xo": "^0.15.0",
+		"stylelint": "^13.13.0",
+		"stylelint-config-xo": "^0.20.0",
 		"ts-jest": "^26.5.5",
 		"ts-loader": "^8.0.17",
 		"typescript": "^4.2.4",

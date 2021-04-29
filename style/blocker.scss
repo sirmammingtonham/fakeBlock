@@ -1,34 +1,29 @@
-.collapse__button {
-	background-color: hsl(3, 100%, 69%);
-	color: hsl(0, 0%, 100%);
-	box-sizing: border-box;
-	border-radius: 2px;
-	font-size: 1em;
-}
+@use '~@material/button/styles';
+@use '~@material/card/mdc-card';
+
+// $material-icons-font-path: '~material-icons/iconfont/';
+
+// @import '~material-icons/iconfont/material-icons.scss';
+// @use '~material-icons/iconfont/material-icons';
+// @use '~@material-icons/font/scss/all';
 
 .collapse {
-	display: block;
+	margin-top: 10px;
+	display: none;
 	max-height: 0;
 	overflow: hidden;
 	transition: max-height 0.5s cubic-bezier(0, 1, 0, 1);
 
-	&.show {
-		max-height: 99em;
-		transition: max-height 0.5s ease-in-out;
+	&__button {
+		background-color: hsl(3deg, 100%, 69%);
+		color: hsl(0deg, 0%, 100%);
+		box-sizing: border-box;
+		border-radius: 2px;
+		font-size: 1em;
 	}
-}
 
-.block {
-	margin-top: 10px;
-	background: #f5f5f5;
-	padding: 0;
-	// height: 250px;
-
-	&__content {
-		border: 1px solid hsl(0, 0%, 80%);
-		padding: 1.5em;
-		height: auto;
-		color: hsl(0, 0%, 0%);
+	p {
+		margin-top: 10px;
 	}
 }
 
@@ -37,12 +32,12 @@
 	// haha funny amogus
 	position: relative;
 	display: inline-block;
-	border-bottom: 1px dotted hsl(0, 0%, 0%);
+	border-bottom: 1px dotted hsl(0deg, 0%, 0%);
 
 	.link-sus-text {
 		visibility: hidden;
 		width: 120px;
-		background-color: hsl(0, 0%, 0%);
+		background-color: hsl(0deg, 0%, 0%);
 		color: #fff;
 		text-align: center;
 		border-radius: 6px;
@@ -60,7 +55,7 @@
 			margin-left: -5px;
 			border-width: 5px;
 			border-style: solid;
-			border-color: transparent transparent hsl(0, 0%, 0%);
+			border-color: transparent transparent hsl(0deg, 0%, 0%);
 		}
 	}
 

@@ -28,34 +28,61 @@ import {ClassifierOutput, AggregateLabels} from './detection/classifier';
 // sets up the html collapsible and wraps the element that is given by the input
 function createCollapsible(p: Element, index: number, result: ClassifierOutput) {
 	const containerDiv = document.createElement('div');
-	const innerDiv = document.createElement('div');
-	innerDiv.classList.add('block', 'collapse', `_${index}`);
 
 	const toggleButton = document.createElement('button');
-	toggleButton.innerHTML = 'Detected fake news! Click to show.';
-	toggleButton.classList.add('collapse__button');
-	toggleButton.dataset.toggle = 'collapse';
-	toggleButton.dataset.target = `.collapse._${index}`;
-	toggleButton.dataset.text = 'Collapse';
+	toggleButton.classList.add('mdc-button', 'mdc-button--outlined');
 
-	const hiddenContent = document.createElement('p');
-	hiddenContent.innerHTML = p.innerHTML;
-	hiddenContent.classList.add('block__content');
+	const toggleButtonRipple = document.createElement('span');
+	toggleButtonRipple.classList.add('mdc-button__ripple');
 
-	const resultsLink = document.createElement('a');
-	resultsLink.innerHTML = 'See why we\'ve blocked this!';
+	const toggleButtonIcon = document.createElement('i');
+	toggleButtonIcon.classList.add('material-icons', 'mdc-button__icon');
+	toggleButtonIcon.setAttribute('aria-hidden', 'true');
+	toggleButtonIcon.innerHTML = 'warning';
 
-	resultsLink.addEventListener('click', async () => {
+	const buttonText = document.createElement('span');
+	buttonText.classList.add('mdc-button__label');
+	buttonText.innerHTML = 'Detected fake news! Click to show.';
+	toggleButton.append(toggleButtonRipple);
+	toggleButton.append(buttonText);
+
+	const hiddenContent = document.createElement('div');
+	hiddenContent.classList.add('mdc-card', 'mdc-card--outlined', 'collapse', `_${index}`);
+
+	const hiddenText = document.createElement('p');
+	hiddenText.innerHTML = p.innerHTML;
+
+	const resultsButton = document.createElement('button');
+	resultsButton.classList.add('mdc-button', 'mdc-card__action', 'mdc-card__action--button');
+	const resultsButtonRipple = document.createElement('div');
+	resultsButtonRipple.classList.add('mdc-button__ripple');
+
+	const resultsButtonLabel = document.createElement('span');
+	resultsButtonLabel.classList.add('mdc-button__label');
+	resultsButtonLabel.innerHTML = 'See why we\'ve blocked this!';
+
+	resultsButton.append(resultsButtonRipple);
+	resultsButton.append(resultsButtonLabel);
+	resultsButton.addEventListener('click', async () => {
 		await browser.runtime.sendMessage({message: 'openNewTab', url: '/public/results.html', result});
 	});
 
-	hiddenContent.append(document.createElement('br'));
-	hiddenContent.append(document.createElement('br'));
-	hiddenContent.append(resultsLink);
-	innerDiv.append(hiddenContent);
+	hiddenContent.append(hiddenText);
+	hiddenContent.append(resultsButton);
+
+	toggleButton.addEventListener('click', () => {
+		if (hiddenContent.style.maxHeight !== `${hiddenContent.scrollHeight}px`) { // eslint-disable-line no-negated-condition
+			hiddenContent.style.display = 'block'; // set display to block so it becomes visible
+			hiddenContent.classList.add('mdc-card--outlined'); // add outline incase it was removed in the else statement
+			hiddenContent.style.maxHeight = `${hiddenContent.scrollHeight}px`; // animate to max height
+		} else {
+			hiddenContent.style.maxHeight = '0px'; // animate to closed
+			hiddenContent.classList.remove('mdc-card--outlined'); // remove outline so we don't see border (can't set display to none because it won't be animated)
+		}
+	});
 
 	containerDiv.append(toggleButton);
-	containerDiv.append(innerDiv);
+	containerDiv.append(hiddenContent);
 	containerDiv.append(document.createElement('br')); // spacing
 	p.replaceWith(containerDiv);
 }
@@ -123,30 +150,6 @@ export async function runBlocker() {
 			}
 		});
 	}));
-
-	const triggers = new Set([...document.querySelectorAll('[data-toggle="collapse"]')]);
-
-	// for every collapsible we put on the page, we add the toggle functionality to open and close the button
-	window.addEventListener('click', ev => {
-		const elm = ev.target as Element;
-		if (triggers.has(elm)) {
-			const selector = elm.getAttribute('data-target');
-			collapse(selector, 'toggle');
-		}
-	}, false);
-
-	const fnmap: any = {
-		toggle: 'toggle',
-		show: 'add',
-		hide: 'remove'
-	};
-
-	const collapse = (selector: any, cmd: string) => {
-		const targets = [...document.querySelectorAll(selector)];
-		for (const target of targets) {
-			target.classList[fnmap[cmd]]('show');
-		}
-	};
 
 	console.log('blocker running in page!');
 

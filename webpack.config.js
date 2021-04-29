@@ -23,6 +23,16 @@ module.exports = {
 	},
 	module: {
 		rules: [
+			// {
+			// 	test: /\.(woff2?|ttf|otf|eot|svg)$/,
+			// 	use: {
+			// 		loader: 'file-loader',
+			// 		options: {
+			// 			name: '[name].[ext]',
+			// 			outputPath: 'fonts/'
+			// 		}
+			// 	}
+			// },
 			{
 				test: /\.(scss|css)$/,
 				use: [
