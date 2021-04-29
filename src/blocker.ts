@@ -26,49 +26,53 @@ import {ClassifierOutput, AggregateLabels} from './detection/classifier';
 })();
 
 // sets up the html collapsible and wraps the element that is given by the input
-function createCollapsible(p: Element, index: number, result: ClassifierOutput) {
-	const containerDiv = document.createElement('div');
-
-	const toggleButton = document.createElement('button');
-	toggleButton.classList.add('mdc-button', 'mdc-button--outlined');
-
-	const toggleButtonRipple = document.createElement('span');
-	toggleButtonRipple.classList.add('mdc-button__ripple');
-
-	const toggleButtonIcon = document.createElement('i');
-	toggleButtonIcon.classList.add('material-icons', 'mdc-button__icon');
-	toggleButtonIcon.setAttribute('aria-hidden', 'true');
-	toggleButtonIcon.innerHTML = 'warning';
-
-	const buttonText = document.createElement('span');
-	buttonText.classList.add('mdc-button__label');
-	buttonText.innerHTML = 'Detected fake news! Click to show.';
-	toggleButton.append(toggleButtonRipple);
-	toggleButton.append(buttonText);
-
-	const hiddenContent = document.createElement('div');
-	hiddenContent.classList.add('mdc-card', 'mdc-card--outlined', 'collapse', `_${index}`);
-
-	const hiddenText = document.createElement('p');
-	hiddenText.innerHTML = p.innerHTML;
-
+function createCollapsible(p: Element, result: ClassifierOutput) {
+	// create the "see why we blocked this" button
 	const resultsButton = document.createElement('button');
 	resultsButton.classList.add('mdc-button', 'mdc-card__action', 'mdc-card__action--button');
 	const resultsButtonRipple = document.createElement('div');
 	resultsButtonRipple.classList.add('mdc-button__ripple');
-
+	const resultsButtonIcon = document.createElement('i');
+	resultsButtonIcon.classList.add('material-icons', 'mdc-button__icon');
+	resultsButtonIcon.setAttribute('aria-hidden', 'true');
+	resultsButtonIcon.innerHTML = 'info';
 	const resultsButtonLabel = document.createElement('span');
 	resultsButtonLabel.classList.add('mdc-button__label');
 	resultsButtonLabel.innerHTML = 'See why we\'ve blocked this!';
-
 	resultsButton.append(resultsButtonRipple);
+	resultsButton.append(resultsButtonIcon);
 	resultsButton.append(resultsButtonLabel);
+
 	resultsButton.addEventListener('click', async () => {
 		await browser.runtime.sendMessage({message: 'openNewTab', url: '/public/results.html', result});
 	});
 
+	// create the card that holds the hidden content
+	const hiddenContent = document.createElement('div');
+	hiddenContent.classList.add('mdc-card', 'mdc-card--outlined', 'collapsible__content');
+	const hiddenText = p.cloneNode(true);
 	hiddenContent.append(hiddenText);
+	if ((hiddenText as HTMLElement).tagName === 'SPAN') {
+		hiddenContent.append(document.createElement('br'));
+	}
+
 	hiddenContent.append(resultsButton);
+
+	// create the collapsible toggle button
+	const toggleButton = document.createElement('button');
+	toggleButton.classList.add('mdc-button', 'mdc-button--outlined');
+	const toggleButtonRipple = document.createElement('span');
+	toggleButtonRipple.classList.add('mdc-button__ripple');
+	const toggleButtonIcon = document.createElement('i');
+	toggleButtonIcon.classList.add('material-icons', 'mdc-button__icon');
+	toggleButtonIcon.setAttribute('aria-hidden', 'true');
+	toggleButtonIcon.innerHTML = 'warning';
+	const buttonText = document.createElement('span');
+	buttonText.classList.add('mdc-button__label');
+	buttonText.innerHTML = 'Detected fake news! Click to show.';
+	toggleButton.append(toggleButtonRipple);
+	toggleButton.append(toggleButtonIcon);
+	toggleButton.append(buttonText);
 
 	toggleButton.addEventListener('click', () => {
 		if (hiddenContent.style.maxHeight !== `${hiddenContent.scrollHeight}px`) { // eslint-disable-line no-negated-condition
@@ -81,9 +85,11 @@ function createCollapsible(p: Element, index: number, result: ClassifierOutput) 
 		}
 	});
 
+	// create the container div that replaces the original paragraph
+	const containerDiv = document.createElement('div');
+	containerDiv.classList.add('collapsible');
 	containerDiv.append(toggleButton);
 	containerDiv.append(hiddenContent);
-	containerDiv.append(document.createElement('br')); // spacing
 	p.replaceWith(containerDiv);
 }
 
@@ -101,7 +107,7 @@ export async function runBlocker() {
 	// if the text is flagged, it is wrapped in the collapsible
 	// to be put in the model, the model must have at least 15 words (as to not clog up the model)
 	const elementArray = document.querySelectorAll('p,dd,li,text');
-	await Promise.all([...elementArray].map(async (p, index) => {
+	await Promise.all([...elementArray].map(async p => {
 		if (!p.textContent || p.textContent.split(' ').length < 15) {
 			return; // skip scanning content that doesn't look to be a complete sentence (< 15 words)
 		}
@@ -110,7 +116,7 @@ export async function runBlocker() {
 			// should maybe have it so if aggregate is mixed, text is highlighted but not blocked
 			if (result && result.valueAggregate !== AggregateLabels.reliable) {
 				count += 1;
-				createCollapsible(p, index, result);
+				createCollapsible(p, result);
 			}
 		});
 	}));
@@ -120,17 +126,24 @@ export async function runBlocker() {
 	// if the text is flagged, it is wrapped in the collapsible
 	// headers usually are not complete sentences, so we lower the length requirement to 5 words
 	const headerArray = document.querySelectorAll('h1,h2,h3,h4,h5,h6');
-	await Promise.all([...headerArray].map(async (p, index) => {
+	await Promise.all([...headerArray].map(async p => {
 		if (!p.textContent || p.textContent.split(' ').length < 5) {
 			return;
 		}
 
-		const result = await browser.runtime.sendMessage({message: 'scanText', text: p.textContent});
-		// should maybe have it so if aggregate is mixed, text is highlighted but not blocked
-		if (result && result.valueAggregate !== AggregateLabels.reliable) {
-			count += 1;
-			createCollapsible(p, index, result);
-		}
+		return browser.runtime.sendMessage({message: 'scanText', text: p.textContent}).then((result: ClassifierOutput) => {
+			if (result && result.valueAggregate !== AggregateLabels.reliable) {
+				count += 1;
+				createCollapsible(p, result);
+			}
+		});
+
+		// const result = await browser.runtime.sendMessage({message: 'scanText', text: p.textContent});
+		// // should maybe have it so if aggregate is mixed, text is highlighted but not blocked
+		// if (result && result.valueAggregate !== AggregateLabels.reliable) {
+		// 	count += 1;
+		// 	createCollapsible(p, result);
+		// }
 	}));
 	console.timeEnd('Headers');
 
@@ -138,7 +151,7 @@ export async function runBlocker() {
 	// go through divs, try getting only divs with text in them
 	// if the text is flagged, it is wrapped in the collapsible
 	// to be put in the model, the model must have at least 15 words (as to not clog up the model)
-	await Promise.all([...divArray].map(async (p, index) => {
+	await Promise.all([...divArray].map(async p => {
 		if (!p.textContent || p.textContent.split(' ').length < 15) { // || p.hasChildNodes
 			return; // skip scanning content that doesn't look to be a complete sentence (< 15 words)
 		}
@@ -146,7 +159,7 @@ export async function runBlocker() {
 		return browser.runtime.sendMessage({message: 'scanText', text: p.textContent}).then((result: ClassifierOutput) => {
 			if (result && result.valueAggregate !== AggregateLabels.reliable) {
 				count += 1;
-				createCollapsible(p, index, result);
+				createCollapsible(p, result);
 			}
 		});
 	}));

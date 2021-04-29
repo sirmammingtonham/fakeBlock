@@ -1,29 +1,31 @@
 @use '~@material/button/styles';
 @use '~@material/card/mdc-card';
+@import url('https://fonts.googleapis.com/icon?family=Material+Icons');
 
-// $material-icons-font-path: '~material-icons/iconfont/';
-
-// @import '~material-icons/iconfont/material-icons.scss';
-// @use '~material-icons/iconfont/material-icons';
-// @use '~@material-icons/font/scss/all';
-
-.collapse {
+.collapsible {
 	margin-top: 10px;
-	display: none;
-	max-height: 0;
-	overflow: hidden;
-	transition: max-height 0.5s cubic-bezier(0, 1, 0, 1);
+	margin-bottom: 10px;
 
-	&__button {
-		background-color: hsl(3deg, 100%, 69%);
-		color: hsl(0deg, 0%, 100%);
-		box-sizing: border-box;
-		border-radius: 2px;
+	button {
+		--mdc-theme-primary: hsl(338deg, 78%, 48%);
+		--mdc-theme-on-primary: hsl(14deg, 96%, 90%);
+	}
+
+	> button {
 		font-size: 1em;
 	}
 
-	p {
-		margin-top: 10px;
+	&__content {
+		margin: 10px;
+		display: none;
+		max-height: 0;
+		overflow: hidden;
+		transition: max-height 0.5s cubic-bezier(0, 1, 0, 1);
+		color: hsla(0deg, 0%, 0%, 90%);
+
+		> button {
+			font-size: 0.75em;
+		}
 	}
 }
 

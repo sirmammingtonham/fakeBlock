@@ -45,7 +45,8 @@
 				true,
 				{
 					"ignoreAtRules": [
-						"use"
+						"use",
+						"include"
 					]
 				}
 			],
@@ -67,11 +68,8 @@
 		"webextension-polyfill-ts": "^0.24.0"
 	},
 	"devDependencies": {
-		"@material-icons/font": "^1.0.8",
 		"@material/button": "^11.0.0",
 		"@material/card": "^11.0.0",
-		"@material/icon-button": "^11.0.0",
-		"@material/ripple": "^11.0.0",
 		"@tensorflow/tfjs-node": "^3.5.0",
 		"@types/enzyme": "^3.10.8",
 		"@types/enzyme-adapter-react-16": "^1.0.6",
@@ -88,9 +86,7 @@
 		"enzyme": "^3.11.0",
 		"enzyme-adapter-react-16": "^1.15.6",
 		"eslint": "^7.14.0",
-		"file-loader": "^6.2.0",
 		"html-webpack-plugin": "^5.2.0",
-		"i": "^0.3.6",
 		"identity-obj-proxy": "^3.0.0",
 		"jest": "^26.6.3",
 		"jsdom": "^16.5.3",

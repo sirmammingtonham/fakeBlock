@@ -1,7 +1,6 @@
 const path = require('path');
 const SizePlugin = require('size-plugin');
 const CopyPlugin = require('copy-webpack-plugin');
-// const TerserPlugin = require('terser-webpack-plugin');
 const {CleanWebpackPlugin} = require('clean-webpack-plugin');
 
 module.exports = {
@@ -23,16 +22,6 @@ module.exports = {
 	},
 	module: {
 		rules: [
-			// {
-			// 	test: /\.(woff2?|ttf|otf|eot|svg)$/,
-			// 	use: {
-			// 		loader: 'file-loader',
-			// 		options: {
-			// 			name: '[name].[ext]',
-			// 			outputPath: 'fonts/'
-			// 		}
-			// 	}
-			// },
 			{
 				test: /\.(scss|css)$/,
 				use: [
@@ -85,20 +74,6 @@ module.exports = {
 		]),
 		new CleanWebpackPlugin()
 	],
-	// optimization: {
-	// 	minimizer: [
-	// 		new TerserPlugin({
-	// 			terserOptions: {
-	// 				mangle: false,
-	// 				compress: false,
-	// 				output: {
-	// 					beautify: true,
-	// 					indent_level: 2 // eslint-disable-line camelcase
-	// 				}
-	// 			}
-	// 		})
-	// 	]
-	// },
 	resolve: {
 		extensions: ['.ts', '.tsx', '.js']
 	}
