@@ -4,11 +4,7 @@ const CopyPlugin = require('copy-webpack-plugin');
 const {CleanWebpackPlugin} = require('clean-webpack-plugin');
 
 module.exports = {
-	mode: process.env.NODE_ENV,
-	devtool:
-		process.env.NODE_ENV === 'production' ?
-			undefined :
-			'inline-cheap-module-source-map',
+	devtool: 'inline-cheap-module-source-map',
 	stats: 'errors-only',
 	entry: {
 		background: './src/background.ts',
@@ -66,10 +62,6 @@ module.exports = {
 			},
 			{
 				from: './public/*'
-			},
-			{
-				from: './ml/distilbert_nela_js',
-				to: 'distilbert'
 			}
 		]),
 		new CleanWebpackPlugin()

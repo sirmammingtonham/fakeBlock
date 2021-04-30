@@ -10,7 +10,6 @@ You can click on a button to reveal the blocked information and open a results p
 
 
 ## Building fakeBlock from source
-Extract the distilBERT model into the `ml/` folder.
 
 Run the following commands:
  1. `npm install .`
@@ -33,6 +32,9 @@ To install on firefox:
  3. Click "Load Temporary Add-on"
  4. Select any file in the `dist/` folder
 
+## Running unit tests
+
+Run `npm run test` to lint the codebase and run our jest testing suite.
 
 
 Initial files based off [browser-extension-template](https://github.com/fregante/browser-extension-template)

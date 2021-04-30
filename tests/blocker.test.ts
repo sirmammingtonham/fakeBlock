@@ -14,6 +14,8 @@ import {TextClassifier} from '../src/detection/text-classifier';
 
 import * as blocker from '../src/blocker'; // must go last for some reason
 
+jest.setTimeout(180000); // alot 3 min timeout to download model (should be cached after first time)
+
 jest.mock('@tensorflow/tfjs', () => ({...tfn})); // mock tfjs web with the node version
 
 jest.mock('webextension-polyfill-ts', () => {
@@ -32,10 +34,12 @@ jest.mock('webextension-polyfill-ts', () => {
 		}};
 });
 
+/* uncomment to use local model instead of hosted one
 const handler = tfn.io.fileSystem(
 	path.resolve(__dirname, '../ml/distilbert_nela_js/model.json')
 );
 jest.spyOn(TextClassifier, 'modelPath', 'get').mockReturnValue(handler); // replace model path getter with tf-node friendly handler
+*/
 
 describe('content script tests', () => {
 	beforeEach(() => {

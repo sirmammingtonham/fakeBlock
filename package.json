@@ -1,15 +1,15 @@
 {
 	"private": true,
 	"scripts": {
+		"build": "webpack --mode=production",
+		"build-dev": "webpack --mode=development",
 		"clean": "rm -rf dist",
-		"build": "webpack --mode=development",
-		"scripts": "tsc scripts/run-scripts.ts --outDir dist/scripts && node dist/scripts/run-scripts.js",
 		"lint": "run-p lint:*",
-		"lint-fix": "run-p 'lint:* -- --fix'",
 		"lint:css": "stylelint style/**/*.scss --fix",
 		"lint:js": "xo --fix",
 		"release:chrome": "cd dist && webstore upload --auto-publish",
 		"release:firefox": "cd dist && web-ext-submit",
+		"scripts": "tsc scripts/run-scripts.ts --outDir dist/scripts && node dist/scripts/run-scripts.js",
 		"test": "npm run lint && jest --coverage --silent",
 		"watch": "webpack --mode=development --watch"
 	},
