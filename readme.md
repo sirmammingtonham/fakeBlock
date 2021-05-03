@@ -5,6 +5,8 @@ RPI Software Design & Documentation S21
 
 fakeBlock is a cross-platform browser extension that functions like an ad-block, but for fake news. 
 
+Check out the demo! https://youtu.be/AVXcAdskUsw
+
 We use a neural network trained on 1.8M news articles to detect whether or not a paragraph contains misinformation, then hide the offending paragraph.
 You can click on a button to reveal the blocked information and open a results page with data about why our model blocked it, such as probability scores and category tags.
 
