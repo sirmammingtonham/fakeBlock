@@ -8,6 +8,8 @@ fakeBlock is a cross-platform browser extension that functions like an ad-block,
 We use a neural network trained on 1.8M news articles to detect whether or not a paragraph contains misinformation, then hide the offending paragraph.
 You can click on a button to reveal the blocked information and open a results page with data about why our model blocked it, such as probability scores and category tags.
 
+![screenshot](https://i.imgur.com/WLAprjU.png)
+
 ## Installing fakeBlock
 Chrome webstore and Firefox addon store release soon! Waiting on review.
 For now, build from source and install with the methods below.
