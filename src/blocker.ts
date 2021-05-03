@@ -101,6 +101,8 @@ export async function runBlocker() {
 	// checkLinks();
 	// Replace paragraphs with collapsible divs
 	// Add support later for other tags
+	console.log('blocker running in page!');
+	console.time('Blocker Time');
 	let count = 0;
 
 	// collects all of the non-header and non-span tags, and runs each piece through the ml model
@@ -164,7 +166,7 @@ export async function runBlocker() {
 		});
 	}));
 
-	console.log('blocker running in page!');
+	console.timeEnd('Blocker Time');
 
 	return count;
 }
