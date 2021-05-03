@@ -22,12 +22,13 @@ export class TextClassifier extends Classifier {
 	}
 
 	/**
-	 * Static getter for model path
+	 * Static getter for model path (public for jest mocks)
+	 * Https hosted model downloads get cached so subsequent loads are fast
 	 *
 	 * @returns Path to model
 	 */
-	private static get modelPath() {
-		return './distilbert/model.json';
+	public static get modelPath(): string | tf.io.IOHandler {
+		return 'https://fakeblock-deberta.s3-us-west-1.amazonaws.com/model.json';
 	}
 
 	/**
@@ -38,7 +39,12 @@ export class TextClassifier extends Classifier {
 	public static async create(): Promise<TextClassifier> {
 		if (TextClassifier.instance === undefined) {
 			TextClassifier.instance = new TextClassifier();
+
+			console.log('started downloading model');
+			console.time('model download');
 			TextClassifier.instance.model = await tf.loadGraphModel(TextClassifier.modelPath);
+			console.timeEnd('model download');
+
 			TextClassifier.instance.tokenizer = new bert.BertTokenizer(true, 512);
 		}
 
@@ -87,7 +93,7 @@ export class TextClassifier extends Classifier {
 
 		tf.engine().endScope();
 
-		console.log(output);
+		console.log(selection.body, output);
 
 		return output;
 	}

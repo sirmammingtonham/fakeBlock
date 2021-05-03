@@ -1,40 +1,31 @@
-*,
-::after,
-::before {
-	box-sizing: border-box;
-}
+@use '~@material/button/styles';
+@use '~@material/card/mdc-card';
+@import url('https://fonts.googleapis.com/icon?family=Material+Icons');
 
-.collapse__button {
-	background-color: hsl(3, 100%, 69%);
-	color: hsl(0, 0%, 100%);
-	box-sizing: border-box;
-	border-radius: 2px;
-	font-size: 1em;
-}
-
-.collapse {
-	display: block;
-	max-height: 0;
-	overflow: hidden;
-	transition: max-height 0.5s cubic-bezier(0, 1, 0, 1);
-
-	&.show {
-		max-height: 99em;
-		transition: max-height 0.5s ease-in-out;
-	}
-}
-
-.block {
+.collapsible {
 	margin-top: 10px;
-	background: #f5f5f5;
-	padding: 0;
-	// height: 250px;
+	margin-bottom: 10px;
+
+	button {
+		--mdc-theme-primary: hsl(338deg, 78%, 48%);
+		--mdc-theme-on-primary: hsl(14deg, 96%, 90%);
+	}
+
+	> button {
+		font-size: 1em;
+	}
 
 	&__content {
-		border: 1px solid hsl(0, 0%, 80%);
-		padding: 1.5em;
-		height: auto;
-		color: hsl(0, 0%, 0%);
+		margin: 10px;
+		display: none;
+		max-height: 0;
+		overflow: hidden;
+		transition: max-height 0.5s cubic-bezier(0, 1, 0, 1);
+		color: hsla(0deg, 0%, 0%, 90%);
+
+		> button {
+			font-size: 0.75em;
+		}
 	}
 }
 
@@ -43,12 +34,12 @@
 	// haha funny amogus
 	position: relative;
 	display: inline-block;
-	border-bottom: 1px dotted hsl(0, 0%, 0%);
+	border-bottom: 1px dotted hsl(0deg, 0%, 0%);
 
 	.link-sus-text {
 		visibility: hidden;
 		width: 120px;
-		background-color: hsl(0, 0%, 0%);
+		background-color: hsl(0deg, 0%, 0%);
 		color: #fff;
 		text-align: center;
 		border-radius: 6px;
@@ -66,7 +57,7 @@
 			margin-left: -5px;
 			border-width: 5px;
 			border-style: solid;
-			border-color: transparent transparent hsl(0, 0%, 0%);
+			border-color: transparent transparent hsl(0deg, 0%, 0%);
 		}
 	}
 

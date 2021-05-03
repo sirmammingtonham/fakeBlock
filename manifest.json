@@ -1,6 +1,6 @@
 {
 	"name": "fakeBlock",
-	"version": "0.0.0",
+	"version": "1.0.0",
 	"description": "Browser extension that protects you from misinformation",
 	"homepage_url": "https://github.com/sirmammingtonham/fakeblock",
 	"manifest_version": 2,
@@ -18,8 +18,7 @@
 		"storage",
 		"tabs",
 		"contextMenus",
-		"activeTab",
-		"webNavigation"
+		"activeTab"
 	],
 	"content_scripts": [
 		{

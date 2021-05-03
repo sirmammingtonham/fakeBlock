@@ -130,11 +130,11 @@ function cleanText(text: string) {
  * Has-a {WordPieceTokenizer} (uses it under the hood)
  */
 export class BertTokenizer {
-	tokenizer: WordPieceTokenizer;
 	clsId: number;
 	sepId: number;
 	maxSeqLength: number;
 	private readonly doLowerCase: boolean;
+	private readonly tokenizer: WordPieceTokenizer;
 
 	constructor(doLowerCase = true,
 		maxSeqLength = 128) {

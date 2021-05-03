@@ -1,15 +1,10 @@
 const path = require('path');
 const SizePlugin = require('size-plugin');
 const CopyPlugin = require('copy-webpack-plugin');
-// const TerserPlugin = require('terser-webpack-plugin');
 const {CleanWebpackPlugin} = require('clean-webpack-plugin');
 
 module.exports = {
-	mode: process.env.NODE_ENV,
-	devtool:
-		process.env.NODE_ENV === 'production' ?
-			undefined :
-			'inline-cheap-module-source-map',
+	devtool: 'inline-cheap-module-source-map',
 	stats: 'errors-only',
 	entry: {
 		background: './src/background.ts',
@@ -67,28 +62,10 @@ module.exports = {
 			},
 			{
 				from: './public/*'
-			},
-			{
-				from: './ml/distilbert_nela_js',
-				to: 'distilbert'
 			}
 		]),
 		new CleanWebpackPlugin()
 	],
-	// optimization: {
-	// 	minimizer: [
-	// 		new TerserPlugin({
-	// 			terserOptions: {
-	// 				mangle: false,
-	// 				compress: false,
-	// 				output: {
-	// 					beautify: true,
-	// 					indent_level: 2 // eslint-disable-line camelcase
-	// 				}
-	// 			}
-	// 		})
-	// 	]
-	// },
 	resolve: {
 		extensions: ['.ts', '.tsx', '.js']
 	}

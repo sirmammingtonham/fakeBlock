@@ -1,9 +1,7 @@
 import React from 'react';
-// import PropTypes from 'prop-types';
 import {makeStyles, LinearProgress, Typography, Box} from '@material-ui/core';
 
 function LinearProgressWithLabel(props: any) {
-	console.log(`percentage:${props.value}`);
 	return (
 		<Box display="flex" alignItems="center">
 			<Box width="100%" mr={1}>
@@ -18,6 +16,7 @@ function LinearProgressWithLabel(props: any) {
 	);
 }
 
+// styles for progressbar
 const useStyles = makeStyles({
 	root: {
 		width: '80%'
@@ -26,6 +25,7 @@ const useStyles = makeStyles({
 
 export default function LinearWithValueLabel(props: any) {
 	const classes = useStyles();
+	// pass in progress data as a prop instead of state for better code clarity
 	const progress = props.percentage;
 	return (
 		<div className={classes.root}>

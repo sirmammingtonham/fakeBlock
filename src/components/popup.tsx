@@ -20,6 +20,7 @@ export default class Popup extends React.Component<PopupProps, PopupState> {
 		this.logStorageChange = this.logStorageChange.bind(this);
 	}
 
+	// handle the power button click
 	async buttonClick() {
 		const retrieved = await browser.storage.local.get('enabled');
 		const enabled = !retrieved.enabled ?? true; // check if anything is assigned
@@ -33,6 +34,7 @@ export default class Popup extends React.Component<PopupProps, PopupState> {
 		this.setState({...this.state, powerOn: enabled});
 	}
 
+	// monitor if there're changes to local storage data
 	logStorageChange(changes: any, area: any) {
 		const changedItems = Object.keys(changes);
 
@@ -45,6 +47,7 @@ export default class Popup extends React.Component<PopupProps, PopupState> {
 		}
 	}
 
+	// get whitelist and enabled data when the component is mounted
 	async componentDidMount() {
 		const enabled: boolean = (await browser.storage.local.get('enabled'))?.enabled ?? true;
 		const disabledList: string[] = (await browser.storage.local.get('whitelist'))?.whitelist ?? [];
@@ -55,6 +58,7 @@ export default class Popup extends React.Component<PopupProps, PopupState> {
 	}
 
 	render() {
+		// styles data for power switch
 		const BigSwitch = withStyles({
 			root: {
 				width: 92,
@@ -93,5 +97,6 @@ export default class Popup extends React.Component<PopupProps, PopupState> {
 		);
 	}
 }
+// export the component to html page
 const appContainer = document.querySelector('#app');
 render(<Popup />, appContainer);
