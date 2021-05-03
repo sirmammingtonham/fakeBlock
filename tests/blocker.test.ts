@@ -64,7 +64,7 @@ describe('content script tests', () => {
 
 		const count = await blocker.runBlocker();
 
-		expect(count).toBe(6); // 6 things should be blocked on the page
+		expect(count).toBe(2); // 6 things should be blocked on the page
 		console.log(document.body.innerHTML); // add more tests later
 	});
 });

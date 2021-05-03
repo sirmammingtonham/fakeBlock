@@ -2,7 +2,8 @@ import '../style/blocker.scss';
 import {browser} from 'webextension-polyfill-ts';
 import {checkDisablelist} from './util/link-util';
 import {Websites, pageType} from './util/page-type';
-import {ClassifierOutput, AggregateLabels} from './detection/classifier';
+import {shouldBlock} from './util/result-util';
+import {ClassifierOutput} from './detection/classifier';
 
 // check if the extension has been enabled by the user
 (async () => {
@@ -108,58 +109,15 @@ export async function runBlocker() {
 	// collects all of the non-header and non-span tags, and runs each piece through the ml model
 	// if the text is flagged, it is wrapped in the collapsible
 	// to be put in the model, the model must have at least 15 words (as to not clog up the model)
-	const elementArray = document.querySelectorAll('p,dd,li,text');
+	const elementArray = document.querySelectorAll('p,span,dd,li,text,h1,h2,h3,h4,h5,h6'); // div
 	await Promise.all([...elementArray].map(async p => {
 		if (!p.textContent || p.textContent.split(' ').length < 15) {
 			return; // skip scanning content that doesn't look to be a complete sentence (< 15 words)
 		}
 
 		return browser.runtime.sendMessage({message: 'scanText', text: p.textContent}).then(result => {
-			// should maybe have it so if aggregate is mixed, text is highlighted but not blocked
-			if (result && result.valueAggregate !== AggregateLabels.reliable) {
-				count += 1;
-				createCollapsible(p, result);
-			}
-		});
-	}));
-
-	console.time('Headers');
-	// collects all of the header tags, and runs each piece through the ml model
-	// if the text is flagged, it is wrapped in the collapsible
-	// headers usually are not complete sentences, so we lower the length requirement to 5 words
-	const headerArray = document.querySelectorAll('h1,h2,h3,h4,h5,h6');
-	await Promise.all([...headerArray].map(async p => {
-		if (!p.textContent || p.textContent.split(' ').length < 5) {
-			return;
-		}
-
-		return browser.runtime.sendMessage({message: 'scanText', text: p.textContent}).then((result: ClassifierOutput) => {
-			if (result && result.valueAggregate !== AggregateLabels.reliable) {
-				count += 1;
-				createCollapsible(p, result);
-			}
-		});
-
-		// const result = await browser.runtime.sendMessage({message: 'scanText', text: p.textContent});
-		// // should maybe have it so if aggregate is mixed, text is highlighted but not blocked
-		// if (result && result.valueAggregate !== AggregateLabels.reliable) {
-		// 	count += 1;
-		// 	createCollapsible(p, result);
-		// }
-	}));
-	console.timeEnd('Headers');
-
-	const divArray = document.querySelectorAll('span'); // div
-	// go through divs, try getting only divs with text in them
-	// if the text is flagged, it is wrapped in the collapsible
-	// to be put in the model, the model must have at least 15 words (as to not clog up the model)
-	await Promise.all([...divArray].map(async p => {
-		if (!p.textContent || p.textContent.split(' ').length < 15) { // || p.hasChildNodes
-			return; // skip scanning content that doesn't look to be a complete sentence (< 15 words)
-		}
-
-		return browser.runtime.sendMessage({message: 'scanText', text: p.textContent}).then((result: ClassifierOutput) => {
-			if (result && result.valueAggregate !== AggregateLabels.reliable) {
+			// console.log(p.textContent);
+			if (shouldBlock(result)) {
 				count += 1;
 				createCollapsible(p, result);
 			}
