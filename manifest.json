@@ -18,8 +18,7 @@
 		"storage",
 		"tabs",
 		"contextMenus",
-		"activeTab",
-		"webNavigation"
+		"activeTab"
 	],
 	"content_scripts": [
 		{
